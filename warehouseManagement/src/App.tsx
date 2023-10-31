@@ -8,6 +8,7 @@ const AppWrapper = styled.div`
     margin: 0 auto;
     padding: 0;
     overflow: hidden;
+  color: #fff;
 `
 
 function App() {

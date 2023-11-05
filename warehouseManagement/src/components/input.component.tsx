@@ -4,14 +4,15 @@ import styled from "styled-components";
 
 type Props = {
     placeholder: string,
-    value: string,
+    value: string | number,
     onChange: (e: ChangeEvent<HTMLInputElement>) => void
 }
 
 const TextInput  = styled(Input)`
-    color: #fff;
+    margin-top: 10px;
+    color: #000;
     &::placeholder {
-      color: #ccc; 
+      color: #000; 
   }
 `
 

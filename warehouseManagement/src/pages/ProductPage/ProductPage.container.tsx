@@ -1,10 +1,13 @@
 import TableComponent from "../../components/table.component.tsx";
 import {mockedProducts, ProductTableHeader} from "../../mock/mockData.mock.ts";
-import {Button, Td, Th, Tr, useToast} from "@chakra-ui/react";
+import {Td, Th, Tr, useToast} from "@chakra-ui/react";
 import ModalComponent from "../../components/modal.component.tsx";
 import InputComponent from "../../components/input.component.tsx";
 import {INITIAL_PRODUCT_VALUES, Product} from "../../models/Product.model.ts";
 import {ChangeEvent, useState} from "react";
+import SinglePageWrapperComponent from "../../components/singlePageWrapper.component.tsx";
+
+
 
 const ProductPageContainer = () => {
     const toast = useToast();
@@ -75,7 +78,7 @@ const ProductPageContainer = () => {
 
     const deletingProductModalContent = (
         <div>
-            <Button>DELETE</Button>
+            <h3>Do you confirm deleting?</h3>
         </div>
     )
 
@@ -104,10 +107,12 @@ const ProductPageContainer = () => {
     </Tr>)
 
     return(
-        <>
-            <ModalComponent  buttonText='Add product'  modalAction={addProductHandler} modalHeader={'Adding product'}  modalContent={addingProductModalContent} />
+        <SinglePageWrapperComponent>
             <TableComponent  tableCaption='Produkty'   mappedData={mappedData} mappedHeaders={mappedHeaders} />
-        </>
+            <div style={{ flex: '0'}}>
+                <ModalComponent  buttonText='Add product'  modalAction={addProductHandler} modalHeader={'Adding product'}  modalContent={addingProductModalContent} />
+            </div>
+        </SinglePageWrapperComponent>
     )
 }
 

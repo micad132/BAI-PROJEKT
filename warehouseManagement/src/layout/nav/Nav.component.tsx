@@ -21,6 +21,7 @@ const NavComponent = () => {
             <SingleLinkComponent path={"/test"} text={'TEST'} />
             <SingleLinkComponent path={"/login"} text={'Login'} />
             <SingleLinkComponent path={"/products"} text={'Products'} />
+            <SingleLinkComponent path={"/invoices"} text={'Invoices'} />
         </NavWrapper>
     )
 }

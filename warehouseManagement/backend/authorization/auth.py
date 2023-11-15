@@ -5,6 +5,8 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from database import database
+from passlib.hash import argon2
+import hashlib
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -12,14 +14,23 @@ __SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
 __ALGORITHM = "HS256"
 __DATABASE = database.Database(url="sqlite:///./database/warehouseManagment.db")
 
-def __verifyPassword(password: str):
+__TYPE = "id"
+__SALT_LEN = 16
+__TIME_COST = 4
+__MEM = 19456
+__PARAL = 1
+
+def __verifyPassword(id_user, password: str):
+
+
     __DATABASE.connect()
-    response = __DATABASE.select("Login", {"password": password})
+    response = __DATABASE.select("Login", {"id": id_user})
     __DATABASE.close()
-    if response:
-        return True
-    else:
-        return False
+    to_verify = f"$argon2{__TYPE}$v=19$m={__MEM},t={__TIME_COST},p={__PARAL}${response[0]['salt']}${response[0]['password']}"
+    return (argon2.using(
+        type=__TYPE, salt_len = __SALT_LEN, time_cost = __TIME_COST,
+                   memory_cost = __MEM, parallelism=__PARAL)
+            .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify))
 
 def __getUser(username: str):
     __DATABASE.connect()
@@ -43,7 +54,7 @@ def authenticateUser(username: str, password: str):
     user =  __getUser(username)
     if not user:
         return False
-    if not  __verifyPassword(password):
+    if not  __verifyPassword(user[0]["id"], password):
         return False
     return user[0]
 

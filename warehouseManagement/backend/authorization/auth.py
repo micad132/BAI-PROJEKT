@@ -7,29 +7,25 @@ from jose import JWTError, jwt
 from database import database
 from passlib.hash import argon2
 import hashlib
+import config
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-__SECRET_KEY = "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
-__ALGORITHM = "HS256"
+
 __DATABASE = database.Database(url="sqlite:///./database/warehouseManagment.db")
 
-__TYPE = "id"
-__SALT_LEN = 16
-__TIME_COST = 4
-__MEM = 19456
-__PARAL = 1
+__CONFIG = config.load_yml("config.yml")
+
 
 def __verifyPassword(id_user, password: str):
-
-
     __DATABASE.connect()
     response = __DATABASE.select("Login", {"id": id_user})
     __DATABASE.close()
-    to_verify = f"$argon2{__TYPE}$v=19$m={__MEM},t={__TIME_COST},p={__PARAL}${response[0]['salt']}${response[0]['password']}"
+    to_verify = (f"$argon2{__CONFIG['AUTH']['TYPE']}$v=19$m={__CONFIG['AUTH']['MEM']},t={__CONFIG['AUTH']['TIME_COST']},"
+                 f"p={__CONFIG['AUTH']['PARAL']}${response[0]['salt']}${response[0]['password']}")
     return (argon2.using(
-        type=__TYPE, salt_len = __SALT_LEN, time_cost = __TIME_COST,
-                   memory_cost = __MEM, parallelism=__PARAL)
+        type=__CONFIG['AUTH']['TYPE'], salt_len = __CONFIG['AUTH']['SALT_LEN'], time_cost = __CONFIG['AUTH']['TIME_COST'],
+                   memory_cost = __CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
             .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify))
 
 def __getUser(username: str):
@@ -47,7 +43,7 @@ def createAccessToken(data: dict, expires_delta: timedelta | None = None):
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
     encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(encode,  __SECRET_KEY, algorithm= __ALGORITHM)
+    encoded_jwt = jwt.encode(encode,  __CONFIG['AUTH']['SECRET_KEY'], algorithm= __CONFIG['AUTH']['ALGORITHM'])
     return encoded_jwt
 
 def authenticateUser(username: str, password: str):
@@ -66,7 +62,7 @@ async def getCurrentUser(token: Annotated[str, Depends(oauth2_scheme )]):
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = jwt.decode(token,  __SECRET_KEY, algorithms=[ __ALGORITHM])
+        payload = jwt.decode(token,  __CONFIG['AUTH']['SECRET_KEY'], algorithms=[ __CONFIG['AUTH']['ALGORITHM']])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception

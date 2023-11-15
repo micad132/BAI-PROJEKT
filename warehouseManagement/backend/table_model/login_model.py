@@ -2,6 +2,9 @@ from pydantic import BaseModel
 
 
 class LoginModel:
+    class Table(BaseModel):
+        login: str
+
     class Create(BaseModel):
         login: str
         password: str

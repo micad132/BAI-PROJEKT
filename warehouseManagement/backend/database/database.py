@@ -4,9 +4,9 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import OperationalError
 
 class Database:
-    def __init__(self):
+    def __init__(self, url):
         self.__engine = None
-
+        self.__url = url
     def __createSessions(self):
         if not self.__engine:
             raise Exception("Database is not connected. Call connect() first.")
@@ -15,8 +15,8 @@ class Database:
         session = Session()
         return session
 
-    def connect(self, path):
-        self.__engine = create_engine(path, connect_args={"check_same_thread": False})
+    def connect(self):
+        self.__engine = create_engine(self.__url, connect_args={"check_same_thread": False})
 
     def close(self):
         if self.__engine:

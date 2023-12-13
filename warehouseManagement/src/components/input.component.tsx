@@ -10,9 +10,9 @@ type Props = {
 
 const TextInput  = styled(Input)`
     margin-top: 10px;
-    color: #000;
+    color: #fff;
     &::placeholder {
-      color: #000; 
+      color: #fff; 
   }
 `
 

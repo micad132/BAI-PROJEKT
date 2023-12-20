@@ -12,12 +12,19 @@ import SingleLinkComponent from '../../layout/nav/SingleLink.component.tsx';
 import { useAppDispatch } from '../../store';
 import { setLoggedUser } from '../../store/reducers/userReducer.tsx';
 import AuthPageWrapperComponent from '../../components/authPageWrapper.component.tsx';
+import { sanitizeData, validateLogin } from '../../services/validators/validator.ts';
 
-const FormWrapper = styled.form`
+const MainContentWrapper = styled.div`
   background-color: #5B7B7A;
   width: 80% !important;
   margin: 0 auto;
   border-radius: 10px;
+  padding: 10px;
+`;
+
+const FormWrapper = styled.form`
+  width: 80% !important;
+  margin: 0 auto;
   padding: 10px;
 `;
 
@@ -26,10 +33,17 @@ const FormControlWrapper = styled(FormControl)`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    & > * {
-      width: 50% !important;
+  justify-content: center;
+    & > *:not(label) {
+      width: 80% !important;
       margin: 0 auto;
     }
+`;
+
+const CustomLabel = styled(FormLabel)`
+  display: block;
+  background-color: palevioletred;
+  text-align: center;
 `;
 
 const LoginPageContainer = () => {
@@ -41,18 +55,19 @@ const LoginPageContainer = () => {
   const toast = useToast();
   const dispatch = useAppDispatch();
 
-  const onChangeHandler = (type: string) => (e: ChangeEvent<HTMLInputElement>) => {
+  const onChangeHandler = (type: string, isSafe: boolean) => (e: ChangeEvent<HTMLInputElement>) => {
     console.log('E', e);
     setLoginData((prevState) => ({
       ...prevState,
-      [type]: e.target.value,
+      [type]: isSafe ? sanitizeData(e.target.value) : e.target.value,
     }));
   };
 
   const onSubmitHandler = (e: any) => {
     setIsLoginSending(true);
     e.preventDefault();
-    return new Promise(() => setTimeout(() => {
+    const result = validateLogin(loginData);
+    if (result.success) {
       setIsLoginSending(false);
       setLoginData(INITIAL_LOGIN_VALUES);
       toast({
@@ -69,15 +84,17 @@ const LoginPageContainer = () => {
         phoneNumber: '123456789',
       }));
       navigate('/');
-    }, 2000));
+    } else {
+      console.log('ERROR', result.error);
+    }
   };
 
   const mainContent = isSafeLoginChecked ? (
     <FormWrapper onSubmit={onSubmitHandler}>
       <FormControlWrapper>
-        <FormLabel>Safe Login</FormLabel>
-        <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username')} />
-        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} />
+        <CustomLabel>Safe Login</CustomLabel>
+        <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', true)} />
+        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', true)} />
         <Button
           isLoading={isLoginSending}
           type="submit"
@@ -91,9 +108,9 @@ const LoginPageContainer = () => {
   ) : (
     <FormWrapper onSubmit={onSubmitHandler}>
       <FormControlWrapper>
-        <FormLabel>Unsafe Login</FormLabel>
-        <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username')} />
-        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} />
+        <CustomLabel>Unsafe Login</CustomLabel>
+        <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', false)} />
+        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', false)} />
         <Button
           isLoading={isLoginSending}
           type="submit"
@@ -114,9 +131,9 @@ const LoginPageContainer = () => {
       >
         Safe login?
       </Checkbox>
-      <FormWrapper>
+      <MainContentWrapper>
         {mainContent}
-      </FormWrapper>
+      </MainContentWrapper>
     </AuthPageWrapperComponent>
   );
 };

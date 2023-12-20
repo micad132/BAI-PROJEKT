@@ -1,13 +1,14 @@
 import {
   Button, Td, Th, Tr, useToast,
 } from '@chakra-ui/react';
-import React, { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import TableComponent from '../../components/table.component.tsx';
 import { mockedProducts, ProductTableHeader } from '../../mock/mockData.mock.ts';
 import ModalComponent from '../../components/modal.component.tsx';
 import InputComponent from '../../components/input.component.tsx';
 import { INITIAL_PRODUCT_VALUES, Product } from '../../models/Product.model.ts';
 import SinglePageWrapperComponent from '../../components/singlePageWrapper.component.tsx';
+import { sanitizeData } from '../../services/validators/validator.ts';
 
 const ProductPageContainer = () => {
   const toast = useToast();
@@ -17,14 +18,14 @@ const ProductPageContainer = () => {
   const onChangeHandler = (type: string) => (e: ChangeEvent<HTMLInputElement>) => {
     setNewProductData((prevState) => ({
       ...prevState,
-      [type]: e.target.value,
+      [type]: sanitizeData(e.target.value),
     }));
   };
 
   const onEditChangeHandler = (type: string) => (e: ChangeEvent<HTMLInputElement>) => {
     setEditProductData((prevState) => ({
       ...prevState,
-      [type]: e.target.value,
+      [type]: sanitizeData(e.target.value),
     }));
   };
 

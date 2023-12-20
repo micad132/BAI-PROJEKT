@@ -23,11 +23,16 @@ const FormControlWrapper = styled(FormControl)`
     display: flex;
     flex-direction: column;
     gap: 10px;
-    & > * {
-      width: 50% !important;
+    & > *:not(label) {
+      width: 80% !important;
       margin: 0 auto;
       color: #fff;
     }
+`;
+
+const CustomLabel = styled(FormLabel)`
+  padding: 0px;
+  text-align: center;
 `;
 
 const RegisterPageContainer = () => {
@@ -87,7 +92,7 @@ const RegisterPageContainer = () => {
   ) : (
     <FormWrapper onSubmit={onSubmitHandler}>
       <FormControlWrapper>
-        <FormLabel>Unsafe Register</FormLabel>
+        <CustomLabel>Unsafe Register</CustomLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username')} />
         <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} />
         <InputComponent placeholder="Confirm your password" value={confirmPassword} onChange={onChangeHandler('confirmPassword')} />

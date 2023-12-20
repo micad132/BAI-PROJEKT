@@ -1,7 +1,7 @@
-import './App.css'
-import LayoutContainer from "./layout/Layout.container.tsx";
-import routes from "./routes";
-import styled from "styled-components";
+import './App.css';
+import styled from 'styled-components';
+import LayoutContainer from './layout/Layout.container.tsx';
+import routes from './routes';
 
 const AppWrapper = styled.div`
     width: 80%;
@@ -9,16 +9,14 @@ const AppWrapper = styled.div`
     padding: 0;
     overflow: hidden;
   color: #fff;
-`
+`;
 
-function App() {
-  return (
-      <AppWrapper>
-          <LayoutContainer>
-              {routes}
-          </LayoutContainer>
-      </AppWrapper>
-  )
-}
+const App = () => (
+  <AppWrapper>
+    <LayoutContainer>
+      {routes}
+    </LayoutContainer>
+  </AppWrapper>
+);
 
-export default App
+export default App;

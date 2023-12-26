@@ -7,6 +7,9 @@ from fastapi.security import OAuth2PasswordRequestForm
 from database import database
 from table_model import category_model, token_model, login_model
 from authorization import auth
+from routers import category
+import uvicorn
+
 app = FastAPI()
 origins = [
     "http://localhost.com",
@@ -22,8 +25,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-db = database.Database(url="sqlite:///./database/warehouseManagment.db")
+
+def get_db():
+    db = database.Database(url="sqlite:///./database/warehouseManagment.db")
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+app.include_router(category.router, dependencies=[Depends(get_db)])
+
 __BLOCK = Annotated[login_model.LoginModel.Table, Depends(auth.getCurrentActiveUser)]
+
+
 #AUTORYZACJA
 @app.post("/token", response_model= token_model.TokenModel)
 async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
@@ -37,52 +52,6 @@ async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, De
     access_token_expires = timedelta(minutes=30)
     access_token = auth.createAccessToken(data={"sub": user["login"]}, expires_delta=access_token_expires)
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@app.get("/category", status_code=200)
-async def getCategory(block: __BLOCK):
-    db.connect()
-    response = db.select("Category")
-    db.close()
-    return response
-
-
-@app.get("/category{id_category}", status_code=200)
-async def getCategory(id_category: int, block: __BLOCK):
-    db.connect()
-    response = db.select("Category", {"id": id_category})
-    db.close()
-    return response
-
-
-@app.post("/category", status_code=201)
-async def createCategory(data: category_model.CategoryModel().Create, block: __BLOCK):
-    body = jsonable_encoder(data)
-    db.connect()
-    response = db.create("Category", body)
-    db.close()
-    return response
-
-
-@app.patch("/category", status_code=200)
-async def updateCategory(data: category_model.CategoryModel().Update, block: __BLOCK):
-    body = jsonable_encoder(data)
-    for key, value in dict(body).items():
-        if value is None:
-            del body[key]
-    db.connect()
-    response = db.update("Category", {"id": body["id"]}, body)
-    db.close()
-    return response
-
-
-@app.delete("/category", status_code=204)
-async def deleteCategory(data: category_model.CategoryModel().Delete, block: __BLOCK):
-    body = jsonable_encoder(data)
-    db.connect()
-    response = db.delete("Category", body)
-    db.close()
-    return response
 
 
 

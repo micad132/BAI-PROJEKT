@@ -5,20 +5,21 @@ import styled from "styled-components";
 type Props = {
     placeholder: string,
     value: string | number,
-    onChange: (e: ChangeEvent<HTMLInputElement>) => void
+    onChange: (e: ChangeEvent<HTMLInputElement>) => void,
+    isBlackText?: boolean,
 }
 
 const TextInput  = styled(Input)`
     margin-top: 10px;
-    color: #fff;
+  color: ${(props) => (props.isBlackText ? '#fff' : '#000')};
     &::placeholder {
-      color: #fff; 
+      color: ${(props) => (props.isBlackText ? '#fff' : '#000')};
   }
 `
 
-const InputComponent = ({ placeholder, value, onChange }: Props) => {
+const InputComponent = ({ placeholder, value, onChange, isBlackText }: Props) => {
     return(
-        <TextInput placeholder={placeholder} value={value} onChange={onChange} size='lg' />
+        <TextInput placeholder={placeholder} value={value} onChange={onChange} size='lg' isBlackText={isBlackText} />
     )
 }
 

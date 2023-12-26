@@ -1,4 +1,3 @@
-
 export type Product = {
     id: string,
     name: string,
@@ -7,8 +6,8 @@ export type Product = {
 }
 
 export const INITIAL_PRODUCT_VALUES: Product = {
-    id: '',
-    name: '',
-    weight: 0,
-    price: 0,
-}
+  id: '',
+  name: '',
+  weight: 0,
+  price: 0,
+};

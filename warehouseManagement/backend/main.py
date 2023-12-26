@@ -7,7 +7,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from database import database
 from table_model import category_model, token_model, login_model
 from authorization import auth
-from routers import category
+from routers import category, product,login, worker
 import uvicorn
 
 app = FastAPI()
@@ -35,6 +35,9 @@ def get_db():
 
 
 app.include_router(category.router, dependencies=[Depends(get_db)])
+app.include_router(product.router, dependencies=[Depends(get_db)])
+app.include_router(login.router, dependencies=[Depends(get_db)])
+app.include_router(worker.router, dependencies=[Depends(get_db)])
 
 __BLOCK = Annotated[login_model.LoginModel.Table, Depends(auth.getCurrentActiveUser)]
 

@@ -1,13 +1,9 @@
-from fastapi import Depends, FastAPI, HTTPException, status, APIRouter
+from fastapi import Depends, APIRouter, HTTPException
 from fastapi.encoders import jsonable_encoder
-from fastapi.middleware.cors import CORSMiddleware
-from datetime import timedelta
 from typing import Annotated
-from fastapi.security import OAuth2PasswordRequestForm
-from table_model import product_model, token_model, login_model
+from table_model import product_model, login_model
 from authorization import auth
 from database import database
-from database_connect import get_db
 
 router = APIRouter(prefix="/product")
 
@@ -15,10 +11,12 @@ db = database.Database(url="sqlite:///./database/warehouseManagment.db")
 __BLOCK = Annotated[login_model.LoginModel.Table, Depends(auth.getCurrentActiveUser)]
 
 @router.get("/", status_code=200)
-async def getProduct(block: __BLOCK, db: database.Database = Depends(get_db)):
+async def getProduct(block: __BLOCK):
     db.connect()
     response = db.select("Product")
     db.close()
+    if response is None or not response:
+        raise HTTPException(status_code=404, detail="Product not found")
     return response
 
 
@@ -27,6 +25,8 @@ async def getProduct(id_product: int, block: __BLOCK):
     db.connect()
     response = db.select("Product", {"id": id_product})
     db.close()
+    if response is None or not response:
+        raise HTTPException(status_code=404, detail="Product not found")
     return response
 
 
@@ -34,8 +34,13 @@ async def getProduct(id_product: int, block: __BLOCK):
 async def createProduct(data: product_model.ProductModel().Create, block: __BLOCK):
     body = jsonable_encoder(data)
     db.connect()
+    check = db.select("Product", {"name": body["name"], "id_category": body["id_category"]})
+    if check:
+        raise HTTPException(status_code=400, detail="Product existed")
     response = db.create("Product", body)
     db.close()
+    if response is None:
+        raise HTTPException(status_code=418, detail="I’m a teapot")
     return response
 
 
@@ -46,8 +51,13 @@ async def updateProduct(data: product_model.ProductModel().Update, block: __BLOC
         if value is None:
             del body[key]
     db.connect()
+    check = db.select("Product", {"id": body["id"]})
+    if not check:
+        raise HTTPException(status_code=400, detail="Product not existed")
     response = db.update("Product", {"id": body["id"]}, body)
     db.close()
+    if response is None:
+        raise HTTPException(status_code=418, detail="I’m a teapot")
     return response
 
 
@@ -55,7 +65,12 @@ async def updateProduct(data: product_model.ProductModel().Update, block: __BLOC
 async def deleteProduct(data: product_model.ProductModel().Delete, block: __BLOCK):
     body = jsonable_encoder(data)
     db.connect()
+    check = db.select("Product", {"id": body["id"]})
+    if not check:
+        raise HTTPException(status_code=400, detail="Product not existed")
     response = db.delete("Product", body)
     db.close()
+    if response is None:
+        raise HTTPException(status_code=418, detail="I’m a teapot")
     return response
 

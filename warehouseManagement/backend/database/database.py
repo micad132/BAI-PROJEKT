@@ -10,7 +10,6 @@ class Database:
     def __createSessions(self):
         if not self.__engine:
             raise Exception("Database is not connected. Call connect() first.")
-
         Session = sessionmaker(autocommit=False, autoflush=False, bind=self.__engine)
         session = Session()
         return session
@@ -42,18 +41,15 @@ class Database:
                 query = text(f'SELECT * FROM {table} WHERE {key} = :{key}')
 
             else:
-                query = text(f'SELECT * FROM {table}')
-                temp = []
-                for key, value in parameters.items():
-                    temp.append(f"{key} = :{value}")
-                query = query.where(text(" AND ".join(temp)))
+                temp = [f'{key} = :{key}' for key in parameters.keys()]
+                query = text(f'SELECT * FROM {table} WHERE {" AND ".join(temp)}')
 
             result = session.execute(query, parameters)
             records = result.fetchall()
             column_names = result.keys()
             return [dict(zip(column_names, record)) for record in records]
         except OperationalError as e:
-            return f"Error: Table '{table}' does not exist or invalid argument"
+            return None
 
     def create(self, table, values):
         if not table or not values:
@@ -66,7 +62,7 @@ class Database:
             session.commit()
             return f'Add {result.rowcount} records.'
         except OperationalError as e:
-            return f"Error: Table '{table}' does not exist or invalid argument"
+            return None
 
     def update(self, table, criteria, values):
         if not table or not criteria or not values:
@@ -82,7 +78,7 @@ class Database:
             session.commit()
             return f'Updated {result.rowcount} records.'
         except OperationalError as e:
-            return f"Error: Table '{table}' does not exist or invalid argument"
+            return None
 
     def delete(self, table, criteria):
         if not table or not criteria:
@@ -95,5 +91,4 @@ class Database:
             session.commit()
             return f'Deleted {result.rowcount} records.'
         except OperationalError as e:
-            return f"Error: Table '{table}' does not exist or invalid argument"
-
+            return None

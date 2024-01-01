@@ -50,9 +50,10 @@ def authenticateUser(username: str, password: str):
     user =  __getUser(username)
     if not user:
         return False
-    if not  __verifyPassword(user[0]["id"], password):
+    if not __verifyPassword(user[0]["id"], password):
         return False
     return user[0]
+
 
 async def getCurrentUser(token: Annotated[str, Depends(oauth2_scheme )]):
     data = {}

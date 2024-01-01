@@ -28,6 +28,16 @@ def __verifyPassword(id_user, password: str):
                    memory_cost = __CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
             .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify))
 
+
+def createHash(password: str):
+    hash = (argon2.using(type=__CONFIG['AUTH']['TYPE'], salt_len=__CONFIG['AUTH']['SALT_LEN'],
+                         time_cost=__CONFIG['AUTH']['TIME_COST'],
+                         memory_cost=__CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
+            .hash(hashlib.sha512(password.encode('UTF-8')).hexdigest())).split('$')
+    return hash[4], hash[5]
+
+
+
 def __getUser(username: str):
     __DATABASE.connect()
     response = __DATABASE.select("Login", {"login": username})

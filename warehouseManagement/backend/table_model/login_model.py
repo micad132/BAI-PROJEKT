@@ -8,7 +8,6 @@ class LoginModel:
     class Create(BaseModel):
         login: str
         password: str
-        salt: str
 
     class Update(BaseModel):
         login: str

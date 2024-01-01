@@ -4,7 +4,6 @@ from typing import Annotated
 from table_model import login_model
 from authorization import auth
 from database import database
-from pydantic import BaseModel
 
 router = APIRouter(prefix="/Account")
 
@@ -22,13 +21,8 @@ async def getLogin(login: str, block: __BLOCK):
     return {"id": response["id"], "login": response["login"], "id_pracownik": response["id_pracownik"]}
 
 
-class User(BaseModel):
-    login: str
-    password: str
-
-
 @router.post("/create", status_code=201)
-async def createAccount(user: User, block: __BLOCK):
+async def createAccount(user: login_model.LoginModel().Create):
     data = auth.createHash(user.password)
     db.connect()
     response = db.create("Login", {"login": user.login, "password": data[1], "salt": data[0]})

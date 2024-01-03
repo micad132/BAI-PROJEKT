@@ -48,6 +48,26 @@ async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, De
         refresh_token=refresh_token
     )
 
+@app.post("/token-unsafe", response_model= token_model.TokenModel, status_code=200)
+async def loginForUnsafeAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    user = auth.authenticateUser(form_data.username, form_data.password, safe=False)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=1)
+    refresh_token_expires = timedelta(days=30)
+    access_token = auth.createAccessToken(data={"sub": user["login"]}, expires_delta=access_token_expires)
+    refresh_token = auth.createRefreshToken(data={"sub": user["login"]}, expires_delta=refresh_token_expires)
+    return token_model.TokenModel(
+        access_token=access_token,
+        token_type="bearer",
+        refresh_token=refresh_token
+    )
+
+
 @app.post("/refresh")
 def refresh_token(Authorization: str = Header()):
     print(Authorization)

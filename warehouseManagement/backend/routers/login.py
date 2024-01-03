@@ -38,6 +38,22 @@ async def createAccount(user: login_model.LoginModel().Create, block: __BLOCK):
     return response
 
 
+@router.post("/create-unsafe", status_code=201)
+async def createUnSafeAccount(user: login_model.LoginModel().Create, block: __BLOCK):
+    if block[0]["role"] != "ADMIN":
+        raise HTTPException(status_code=403, detail="Permission Denied")
+    body = jsonable_encoder(user)
+    data = auth.createMd5(user.password)
+    db.connect()
+    check = db.select("Login", {"login": body["login"]})
+    if check:
+        raise HTTPException(status_code=400, detail="Account existed")
+    response = db.create("Login", {"login": user.login, "password": data, "salt": 0, "role": "PRACOWNIK"})
+    db.close()
+    if response is None:
+        raise HTTPException(status_code=418, detail="I’m a teapot")
+    return response
+
 @router.patch("/", status_code=200)
 async def updatePassword(data: login_model.LoginModel().Update, block: __BLOCK):
     if block[0]["role"] != "ADMIN":

@@ -1,14 +1,11 @@
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.encoders import jsonable_encoder
+from fastapi import Depends, FastAPI, HTTPException, status, Header
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import timedelta
 from typing import Annotated
 from fastapi.security import OAuth2PasswordRequestForm
-from database import database
-from table_model import category_model, token_model, login_model
+from table_model import token_model
 from authorization import auth
 from routers import category, product,login, worker
-import uvicorn
 
 app = FastAPI()
 origins = [
@@ -22,34 +19,17 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=['GET', 'POST', 'PATCH', 'DELETE'],
-    allow_headers=[
-        'Content-Type',
-        'Authorization',
-        'Accept',
-        'Origin',
-        'X-Requested-With'
-    ],
+    allow_headers="*"
 )
 
-
-def get_db():
-    db = database.Database(url="sqlite:///./database/warehouseManagment.db")
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.include_router(category.router, dependencies=[Depends(get_db)])
-app.include_router(product.router, dependencies=[Depends(get_db)])
-app.include_router(login.router, dependencies=[Depends(get_db)])
-app.include_router(worker.router, dependencies=[Depends(get_db)])
-
-__BLOCK = Annotated[login_model.LoginModel.Table, Depends(auth.getCurrentActiveUser)]
+app.include_router(category.router)
+app.include_router(product.router)
+app.include_router(login.router)
+app.include_router(worker.router)
 
 
 #AUTORYZACJA
-@app.post("/token", response_model= token_model.TokenModel)
+@app.post("/token", response_model= token_model.TokenModel, status_code=200)
 async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = auth.authenticateUser(form_data.username, form_data.password)
     if not user:
@@ -58,9 +38,27 @@ async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, De
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=30)
+    access_token_expires = timedelta(minutes=1)
+    refresh_token_expires = timedelta(days=30)
     access_token = auth.createAccessToken(data={"sub": user["login"]}, expires_delta=access_token_expires)
-    return {"access_token": access_token, "token_type": "bearer"}
+    refresh_token = auth.createRefreshToken(data={"sub": user["login"]}, expires_delta=refresh_token_expires)
+    return token_model.TokenModel(
+        access_token=access_token,
+        token_type="bearer",
+        refresh_token=refresh_token
+    )
 
+@app.post("/refresh")
+def refresh_token(Authorization: str = Header()):
+    print(Authorization)
+    if not Authorization.startswith("Bearer "):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authorization header",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    refresh_token = Authorization.split("Bearer ")[1].strip()
+    new_access_token = auth.refreshAccessToken(refresh_token)
+    return{"access_token": new_access_token, "token_type": "bearer"}
 
 

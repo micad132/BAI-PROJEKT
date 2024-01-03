@@ -51,10 +51,41 @@ def createAccessToken(data: dict, expires_delta: timedelta | None = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=1)
     encode.update({"exp": expire})
     encoded_jwt = jwt.encode(encode,  __CONFIG['AUTH']['SECRET_KEY'], algorithm= __CONFIG['AUTH']['ALGORITHM'])
     return encoded_jwt
+
+
+def createRefreshToken(data: dict, expires_delta: timedelta | None = None):
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(days=7)
+    data.update({"exp": expire})
+    refresh_token = jwt.encode(data,  __CONFIG['AUTH']['REFRESH_SECRET_KEY'], algorithm= __CONFIG['AUTH']['ALGORITHM'])
+    return refresh_token
+
+
+def refreshAccessToken(refresh_token: str):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(refresh_token,  __CONFIG['AUTH']['REFRESH_SECRET_KEY'], algorithms=[ __CONFIG['AUTH']['ALGORITHM']])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        user =  __getUser(username=username)
+        if user is None:
+            raise credentials_exception
+        access_token = createAccessToken({"sub": username})
+        return access_token
+    except JWTError:
+        raise credentials_exception
+
 
 def authenticateUser(username: str, password: str):
     user =  __getUser(username)

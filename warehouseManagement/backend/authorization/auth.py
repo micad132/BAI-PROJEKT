@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from database import database
-from passlib.hash import argon2
+from passlib.hash import argon2, md5_crypt
 import hashlib
 import config
 
@@ -29,6 +29,12 @@ def __verifyPassword(id_user, password: str):
             .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify))
 
 
+def __verifyUnsafePassword(id_user, password: str):
+    __DATABASE.connect()
+    response = __DATABASE.select("Login", {"id": id_user})
+    __DATABASE.close()
+    return md5_crypt.verify(password, response[0]["password"])
+
 def createHash(password: str):
     hash = (argon2.using(type=__CONFIG['AUTH']['TYPE'], salt_len=__CONFIG['AUTH']['SALT_LEN'],
                          time_cost=__CONFIG['AUTH']['TIME_COST'],
@@ -36,6 +42,9 @@ def createHash(password: str):
             .hash(hashlib.sha512(password.encode('UTF-8')).hexdigest())).split('$')
     return hash[4], hash[5]
 
+
+def createMd5(password: str):
+    return md5_crypt.hash(password)
 
 
 def __getUser(username: str):
@@ -87,13 +96,18 @@ def refreshAccessToken(refresh_token: str):
         raise credentials_exception
 
 
-def authenticateUser(username: str, password: str):
+def authenticateUser(username: str, password: str, safe=True):
     user =  __getUser(username)
     if not user:
         return False
-    if not __verifyPassword(user[0]["id"], password):
-        return False
+    if not safe:
+        if not __verifyUnsafePassword(user[0]["id"], password):
+            return False
+    else:
+        if not __verifyPassword(user[0]["id"], password):
+            return False
     return user[0]
+
 
 
 async def getCurrentUser(token: Annotated[str, Depends(oauth2_scheme )]):

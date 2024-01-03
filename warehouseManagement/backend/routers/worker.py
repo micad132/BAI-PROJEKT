@@ -22,9 +22,9 @@ async def getWorker(block: __BLOCK):
 
 
 @router.get("/{id_worker}", status_code=200)
-async def getWorker(id_worker: int, block: __BLOCK):
+async def getWorker(id_worker, block: __BLOCK):
     db.connect()
-    response = db.select("Workers", {"id": id_worker})
+    response = db.query(f"SELECT * FROM Workers WHERE id = {id_worker}")
     db.close()
     if response is None or not response:
         raise HTTPException(status_code=404, detail="Workers not found")

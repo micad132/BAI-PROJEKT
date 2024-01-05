@@ -96,17 +96,17 @@ def refreshAccessToken(refresh_token: str):
         username = str(payload.get("sub"))
         if username is None:
             raise credentials_exception
-        user =  __getUser(username=username)
+        user = __getUser(username=username)
         if user is None:
             raise credentials_exception
         access_token = createAccessToken({"sub": username})
         return access_token
-    except JWTError as e:
-        print(e)
+    except JWTError:
+        raise credentials_exception
 
 
 def authenticateUser(username: str, password: str, safe=True):
-    user =  __getUser(username)
+    user = __getUser(username)
     if not user:
         return False
     if not safe:
@@ -116,7 +116,6 @@ def authenticateUser(username: str, password: str, safe=True):
         if not __verifyPassword(user["id"], password):
             return False
     return user
-
 
 
 async def getCurrentUser(token: Annotated[str, Depends(oauth2_scheme )]):
@@ -129,7 +128,6 @@ async def getCurrentUser(token: Annotated[str, Depends(oauth2_scheme )]):
     try:
         payload = jwt.decode(token,  __CONFIG['AUTH']['SECRET_KEY'], algorithms=[ __CONFIG['AUTH']['ALGORITHM']])
         username: str = payload.get("sub")
-        print(payload)
         if username is None:
             raise credentials_exception
         data["username"] = username

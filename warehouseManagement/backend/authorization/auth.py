@@ -55,7 +55,7 @@ def __getUser(username: str):
     if login and personalData:
         return {
             "id": login[0]["id"],
-            "login": login[0]["id_pracownik"],
+            "login": login[0]["login"],
             "name": personalData[0]["name"],
             "surname": personalData[0]["surname"],
             "workplace": personalData[0]["workplace"],
@@ -69,7 +69,7 @@ def createAccessToken(data: dict, expires_delta: timedelta | None = None):
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=10)
+        expire = datetime.utcnow() + timedelta(minutes=1)
     encode.update({"exp": expire})
     encoded_jwt = jwt.encode(encode,  __CONFIG['AUTH']['SECRET_KEY'], algorithm= __CONFIG['AUTH']['ALGORITHM'])
     return encoded_jwt
@@ -93,7 +93,7 @@ def refreshAccessToken(refresh_token: str):
     )
     try:
         payload = jwt.decode(refresh_token,  __CONFIG['AUTH']['REFRESH_SECRET_KEY'], algorithms=[ __CONFIG['AUTH']['ALGORITHM']])
-        username: str = payload.get("sub")
+        username = str(payload.get("sub"))
         if username is None:
             raise credentials_exception
         user =  __getUser(username=username)
@@ -101,8 +101,8 @@ def refreshAccessToken(refresh_token: str):
             raise credentials_exception
         access_token = createAccessToken({"sub": username})
         return access_token
-    except JWTError:
-        raise credentials_exception
+    except JWTError as e:
+        print(e)
 
 
 def authenticateUser(username: str, password: str, safe=True):
@@ -129,6 +129,7 @@ async def getCurrentUser(token: Annotated[str, Depends(oauth2_scheme )]):
     try:
         payload = jwt.decode(token,  __CONFIG['AUTH']['SECRET_KEY'], algorithms=[ __CONFIG['AUTH']['ALGORITHM']])
         username: str = payload.get("sub")
+        print(payload)
         if username is None:
             raise credentials_exception
         data["username"] = username

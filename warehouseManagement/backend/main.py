@@ -1,4 +1,4 @@
-from fastapi import Depends, FastAPI, HTTPException, status, Header
+from fastapi import Depends, FastAPI, HTTPException, status, Form
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import timedelta
 from typing import Annotated
@@ -38,7 +38,7 @@ async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, De
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=10)
+    access_token_expires = timedelta(minutes=1)
     refresh_token_expires = timedelta(days=30)
     access_token = auth.createAccessToken(data={"sub": user["login"]}, expires_delta=access_token_expires)
     refresh_token = auth.createRefreshToken(data={"sub": user["login"]}, expires_delta=refresh_token_expires)
@@ -79,15 +79,8 @@ async def loginForUnsafeAccessToken(form_data: Annotated[OAuth2PasswordRequestFo
 
 
 @app.post("/refresh")
-def refresh_token(Authorization: str = Header()):
-    if not Authorization.startswith("Bearer "):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authorization header",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    refresh_token = Authorization.split("Bearer ")[1].strip()
-    new_access_token = auth.refreshAccessToken(refresh_token)
+def refresh_token(refresh: str = Form()):
+    new_access_token = auth.refreshAccessToken(refresh)
     return{"access_token": new_access_token, "token_type": "bearer"}
 
 

@@ -94,6 +94,7 @@ const ProductPageContainer = () => {
     </div>
   );
 
+  // eslint-disable-next-line react/no-array-index-key
   const mappedHeaders = ProductTableHeader.map((header, index) => <Th isNumeric={header.isNumeric} key={index}>{header.name}</Th>);
   const mappedData = mockedProducts.map((data) => (
     <Tr key={data.id}>

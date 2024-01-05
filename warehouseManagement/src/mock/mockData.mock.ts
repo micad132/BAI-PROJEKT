@@ -92,3 +92,22 @@ export const InvoiceTableHeader = [
     isNumeric: false,
   },
 ];
+
+export const CATEGORIES_TABLE_HEADERS = [
+  {
+    name: 'ID',
+    isNumeric: false,
+  },
+  {
+    name: 'Nazwa',
+    isNumeric: false,
+  },
+  {
+    name: 'Edytuj',
+    isNumeric: false,
+  },
+  {
+    name: 'Usuń',
+    isNumeric: false,
+  },
+] as const;

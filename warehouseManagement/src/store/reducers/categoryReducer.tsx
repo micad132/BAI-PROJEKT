@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { type RootState } from '../index';
 import { Category } from '../../models/Category.model.ts';
+import api from '../../services/api/AxiosApi.ts';
 
 interface CategoryReducer {
   categories: Category[],
@@ -16,13 +17,14 @@ const initialState: CategoryReducer = {
 export const fetchingCategoriesThunk = createAsyncThunk(
   'test',
   async () => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem('accessToken');
     try {
-      const data = await axios.get('http://localhost:8080/category/', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const data = await api.get('http://localhost:8000/category/');
+      // const data = await axios.get('http://localhost:8000/category/', {
+      //   headers: {
+      //     Authorization: `Bearer ${token}`,
+      //   },
+      // });
       console.log('DATA KAT', data);
     } catch (e) {
       console.log(e);
@@ -39,7 +41,7 @@ const categorySlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder.addCase(fetchingCategoriesThunk.fulfilled, (state, action) => {
-      state.categories = action.payload;
+      // state.categories = action.payload;
       state.isLoaded = true;
     });
   },

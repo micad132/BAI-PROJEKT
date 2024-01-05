@@ -67,7 +67,7 @@ const LoginPageContainer = () => {
   const onSubmitHandler = async (e: any) => {
     setIsLoginSending(true);
     e.preventDefault();
-    const { data } = await axios.post('http://localhost:8000/token', { username, password }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
+    const { data } = await axios.post('http://localhost:8000/SignIn', { username, password }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
     console.log('DATA', data);
     localStorage.setItem('accessToken', data.access_token);
     localStorage.setItem('refreshToken', data.refresh_token);

@@ -6,11 +6,11 @@ import ContentTableComponent from './components/ContentTable.component.tsx';
 import { fetchingCategoriesThunk } from '../../store/reducers/categoryReducer.tsx';
 
 const HomeContainer = () => {
-  const dispatch = useAppDispatch();
+  // const dispatch = useAppDispatch();
   const loggedUser = useAppSelector(getLoggedUser);
-  useEffect(() => {
-    dispatch(fetchingCategoriesThunk());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchingCategoriesThunk());
+  // }, [dispatch]);
   return (
     <div>
       <LoggedUserComponent username={loggedUser.username} />

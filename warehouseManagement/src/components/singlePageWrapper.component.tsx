@@ -1,22 +1,19 @@
-import styled from "styled-components";
-import {ReactNode} from "react";
-
+import styled from 'styled-components';
+import { ReactNode } from 'react';
 
 const SinglePageWrapper = styled.div`
   display: flex;
   flex-direction: column;
-`
+`;
 
 type Props = {
-    children: ReactNode,
-}
+  children: ReactNode,
+};
 
-const SinglePageWrapperComponent = ({children}: Props) => {
-    return(
-        <SinglePageWrapper>
-            {children}
-        </SinglePageWrapper>
-    )
-}
+const SinglePageWrapperComponent = ({ children }: Props) => (
+  <SinglePageWrapper>
+    {children}
+  </SinglePageWrapper>
+);
 
 export default SinglePageWrapperComponent;

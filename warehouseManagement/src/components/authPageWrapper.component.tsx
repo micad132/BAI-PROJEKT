@@ -11,8 +11,8 @@ const AuthPageWrapper = styled.div`
 `;
 
 type Props = {
-    children: ReactNode,
-}
+  children: ReactNode,
+};
 
 const AuthPageWrapperComponent = ({ children }: Props) => <AuthPageWrapper>{children}</AuthPageWrapper>;
 

@@ -1,5 +1,6 @@
 import './App.css';
 import styled from 'styled-components';
+import axios from 'axios';
 import LayoutContainer from './layout/Layout.container.tsx';
 import routes from './routes';
 
@@ -10,6 +11,8 @@ const AppWrapper = styled.div`
     overflow: hidden;
   color: #fff;
 `;
+
+axios.defaults.withCredentials = true;
 
 const App = () => (
   <AppWrapper>

@@ -1,6 +1,7 @@
 {
   "extends": [
     "airbnb",
+    "airbnb-typescript",
     "plugin:@typescript-eslint/recommended"
   ],
   "rules": {
@@ -24,6 +25,7 @@
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"],
   "parserOptions": {
-    "ecmaVersion": 2020
+    "ecmaVersion": 2020,
+    "project": "./tsconfig.json"
   }
 }

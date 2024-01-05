@@ -21,7 +21,7 @@ const NormalPagesWrapper = styled.div`
 
 const AuthPagesWrapper = styled.div`
     position: absolute;
-    right: 30px;
+    right: 30px; 
     display: flex;
     gap: 10px;
 `;
@@ -32,6 +32,7 @@ const NavComponent = () => (
       <SingleLinkComponent path="/" text="HOME" />
       <SingleLinkComponent path="/products" text="Products" />
       <SingleLinkComponent path="/invoices" text="Invoices" />
+      <SingleLinkComponent path="/categories" text="Categories" />
     </NormalPagesWrapper>
     <AuthPagesWrapper>
       <SingleLinkComponent path="/login" text="Login" />

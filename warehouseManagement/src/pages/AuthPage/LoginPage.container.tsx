@@ -6,6 +6,7 @@ import {
 import { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import InputComponent from '../../components/input.component.tsx';
 import { INITIAL_LOGIN_VALUES, LoginData } from '../../models/Auth.model.ts';
 import SingleLinkComponent from '../../layout/nav/SingleLink.component.tsx';
@@ -63,30 +64,29 @@ const LoginPageContainer = () => {
     }));
   };
 
-  const onSubmitHandler = (e: any) => {
+  const onSubmitHandler = async (e: any) => {
     setIsLoginSending(true);
     e.preventDefault();
-    const result = validateLogin(loginData);
-    if (result.success) {
-      setIsLoginSending(false);
-      setLoginData(INITIAL_LOGIN_VALUES);
-      toast({
-        title: 'Pomyślnie zalogowano!',
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-        position: 'top-right',
-      });
-      dispatch(setLoggedUser({
-        username: 'mikad132',
-        postalCode: '12-343',
-        city: 'Kielce',
-        phoneNumber: '123456789',
-      }));
-      navigate('/');
-    } else {
-      console.log('ERROR', result.error);
-    }
+    const { data } = await axios.post('http://localhost:8000/token', { username, password }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
+    console.log('DATA', data);
+    localStorage.setItem('accessToken', data.access_token);
+    localStorage.setItem('refreshToken', data.refresh_token);
+    setIsLoginSending(false);
+    setLoginData(INITIAL_LOGIN_VALUES);
+    toast({
+      title: 'Pomyślnie zalogowano!',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+      position: 'top-right',
+    });
+    dispatch(setLoggedUser({
+      username: 'mikad132',
+      postalCode: '12-343',
+      city: 'Kielce',
+      phoneNumber: '123456789',
+    }));
+    navigate('/');
   };
 
   const mainContent = isSafeLoginChecked ? (

@@ -1,11 +1,7 @@
-
-const TestContainer = () => {
-
-    return(
-        <div>
-            TEST
-        </div>
-    )
-}
+const TestContainer = () => (
+  <div>
+    TEST
+  </div>
+);
 
 export default TestContainer;

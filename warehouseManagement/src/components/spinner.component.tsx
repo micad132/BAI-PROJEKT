@@ -1,5 +1,5 @@
-import { Spinner } from '@chakra-ui/react'
+import { Spinner } from '@chakra-ui/react';
 
-const SpinnerComponent = () => <Spinner size='xl' />
+const SpinnerComponent = () => <Spinner size="xl" />;
 
 export default SpinnerComponent;

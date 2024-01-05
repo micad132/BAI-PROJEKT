@@ -13,7 +13,6 @@ origins = [
     "https://localhost.com",
     "http://localhost",
     "http://localhost:8080",
-    "http://localhost:5173"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -30,13 +29,13 @@ app.include_router(worker.router)
 
 
 #AUTORYZACJA
-@app.post("/token", response_model= token_model.TokenModel, status_code=200)
+@app.post("/SignIn", response_model= token_model.TokenModel, status_code=200)
 async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = auth.authenticateUser(form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=1)
@@ -46,16 +45,21 @@ async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, De
     return token_model.TokenModel(
         access_token=access_token,
         token_type="bearer",
-        refresh_token=refresh_token
+        refresh_token=refresh_token,
+        name=user["name"],
+        surname=user["surname"],
+        email=user["email"],
+        workplace=user["workplace"],
+        role=user["role"],
     )
 
-@app.post("/token-unsafe", response_model= token_model.TokenModel, status_code=200)
+@app.post("/SignIn-unsafe", response_model= token_model.TokenModel, status_code=200)
 async def loginForUnsafeAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = auth.authenticateUser(form_data.username, form_data.password, safe=False)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
     access_token_expires = timedelta(minutes=1)
@@ -65,13 +69,17 @@ async def loginForUnsafeAccessToken(form_data: Annotated[OAuth2PasswordRequestFo
     return token_model.TokenModel(
         access_token=access_token,
         token_type="bearer",
-        refresh_token=refresh_token
+        refresh_token=refresh_token,
+        name=user["name"],
+        surname=user["surname"],
+        email=user["email"],
+        workplace=user["workplace"],
+        role=user["role"],
     )
 
 
 @app.post("/refresh")
 def refresh_token(Authorization: str = Header()):
-    print(Authorization)
     if not Authorization.startswith("Bearer "):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

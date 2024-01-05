@@ -49,10 +49,19 @@ def createMd5(password: str):
 
 def __getUser(username: str):
     __DATABASE.connect()
-    response = __DATABASE.select("Login", {"login": username})
+    login = __DATABASE.select("Login", {"login": username})
+    personalData = __DATABASE.select("Workers", {"id": login[0]["id_pracownik"]})
     __DATABASE.close()
-    if response:
-        return response
+    if login and personalData:
+        return {
+            "id": login[0]["id"],
+            "login": login[0]["id_pracownik"],
+            "name": personalData[0]["name"],
+            "surname": personalData[0]["surname"],
+            "workplace": personalData[0]["workplace"],
+            "role": login[0]["role"],
+            "email": login[0]["login"]
+        }
 
 
 def createAccessToken(data: dict, expires_delta: timedelta | None = None):
@@ -101,12 +110,12 @@ def authenticateUser(username: str, password: str, safe=True):
     if not user:
         return False
     if not safe:
-        if not __verifyUnsafePassword(user[0]["id"], password):
+        if not __verifyUnsafePassword(user["id"], password):
             return False
     else:
-        if not __verifyPassword(user[0]["id"], password):
+        if not __verifyPassword(user["id"], password):
             return False
-    return user[0]
+    return user
 
 
 

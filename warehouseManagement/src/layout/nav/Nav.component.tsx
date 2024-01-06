@@ -31,7 +31,7 @@ const NavComponent = () => (
     <NormalPagesWrapper>
       <SingleLinkComponent path="/" text="HOME" />
       <SingleLinkComponent path="/products" text="Products" />
-      <SingleLinkComponent path="/invoices" text="Invoices" />
+      <SingleLinkComponent path="/workers" text="Workers" />
       <SingleLinkComponent path="/categories" text="Categories" />
     </NormalPagesWrapper>
     <AuthPagesWrapper>

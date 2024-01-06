@@ -9,11 +9,14 @@ import InputComponent from '../../components/input.component.tsx';
 import { INITIAL_PRODUCT_VALUES, Product } from '../../models/Product.model.ts';
 import SinglePageWrapperComponent from '../../components/singlePageWrapper.component.tsx';
 import { sanitizeData } from '../../services/validators/validator.ts';
+import { useAppSelector } from '../../store';
+import { getProducts } from '../../store/reducers/productReducer.tsx';
 
 const ProductPageContainer = () => {
   const toast = useToast();
   const [newProductData, setNewProductData] = useState<Product>(INITIAL_PRODUCT_VALUES);
   const [editProductData, setEditProductData] = useState<Product>(INITIAL_PRODUCT_VALUES);
+  const products = useAppSelector(getProducts);
 
   const onChangeHandler = (type: string) => (e: ChangeEvent<HTMLInputElement>) => {
     setNewProductData((prevState) => ({
@@ -96,12 +99,12 @@ const ProductPageContainer = () => {
 
   // eslint-disable-next-line react/no-array-index-key
   const mappedHeaders = ProductTableHeader.map((header, index) => <Th isNumeric={header.isNumeric} key={index}>{header.name}</Th>);
-  const mappedData = mockedProducts.map((data) => (
+  const mappedData = products.map((data) => (
     <Tr key={data.id}>
       <Td>{data.id}</Td>
+      <Td>{data.id_category}</Td>
       <Td>{data.name}</Td>
-      <Td isNumeric>{data.weight}</Td>
-      <Td isNumeric>{data.price}</Td>
+      <Td>{data.describe}</Td>
       <Td>
         <ModalComponent
           buttonText="Edytuj"

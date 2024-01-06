@@ -14,6 +14,7 @@ import { useAppDispatch } from '../../store';
 import { setLoggedUser } from '../../store/reducers/userReducer.tsx';
 import AuthPageWrapperComponent from '../../components/authPageWrapper.component.tsx';
 import { sanitizeData, validateLogin } from '../../services/validators/validator.ts';
+import { User } from '../../models/User.model.ts';
 
 const MainContentWrapper = styled.div`
   background-color: #5B7B7A;
@@ -69,6 +70,13 @@ const LoginPageContainer = () => {
     e.preventDefault();
     const { data } = await axios.post('http://localhost:8000/SignIn', { username, password }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
     console.log('DATA', data);
+    const loggedUserData: User = {
+      email: data.email,
+      name: data.name,
+      role: data.role,
+      surname: data.role,
+      workplace: data.workplace,
+    };
     localStorage.setItem('accessToken', data.access_token);
     localStorage.setItem('refreshToken', data.refresh_token);
     setIsLoginSending(false);
@@ -80,12 +88,7 @@ const LoginPageContainer = () => {
       isClosable: true,
       position: 'top-right',
     });
-    dispatch(setLoggedUser({
-      username: 'mikad132',
-      postalCode: '12-343',
-      city: 'Kielce',
-      phoneNumber: '123456789',
-    }));
+    dispatch(setLoggedUser(loggedUserData));
     navigate('/');
   };
 
@@ -94,7 +97,7 @@ const LoginPageContainer = () => {
       <FormControlWrapper>
         <CustomLabel>Safe Login</CustomLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', true)} />
-        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', true)} />
+        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', true)} isPassword />
         <Button
           isLoading={isLoginSending}
           type="submit"
@@ -110,7 +113,7 @@ const LoginPageContainer = () => {
       <FormControlWrapper>
         <CustomLabel>Unsafe Login</CustomLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', false)} />
-        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', false)} />
+        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', false)} isPassword />
         <Button
           isLoading={isLoginSending}
           type="submit"

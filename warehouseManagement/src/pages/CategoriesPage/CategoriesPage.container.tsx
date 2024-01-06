@@ -7,36 +7,28 @@ import SinglePageWrapperComponent from '../../components/singlePageWrapper.compo
 import TableComponent from '../../components/table.component.tsx';
 import ModalComponent from '../../components/modal.component.tsx';
 import { CATEGORIES_TABLE_HEADERS } from '../../mock/mockData.mock.ts';
-import { Category } from '../../models/Category.model.ts';
 import InputComponent from '../../components/input.component.tsx';
 import { sanitizeData } from '../../services/validators/validator.ts';
-import { INITIAL_PRODUCT_VALUES } from '../../models/Product.model.ts';
-import { fetchingCategoriesThunk } from '../../store/reducers/categoryReducer.tsx';
-import { useAppDispatch } from '../../store';
-import api from '../../services/api/AxiosApi.ts';
-
-const MOCKED_DATA: Category[] = [
-  {
-    id: '1',
-    name: 'COS',
-  },
-  {
-    id: '2',
-    name: 'GUWIENKO',
-  },
-  {
-    id: '3',
-    name: 'JOTDE',
-  },
-];
+import { addingCategoryThunk, deletingCategoryThunk, getCategories } from '../../store/reducers/categoryReducer.tsx';
+import { useAppDispatch, useAppSelector } from '../../store';
+import SpanComponent from '../../components/span.component.tsx';
 
 const CategoriesPageContainer = () => {
-  const toast = useToast();
   const dispatch = useAppDispatch();
+  const toast = useToast();
   const [addCategoryData, setAddCategoryData] = useState<string>('');
   const [editCategoryData, setEditCategoryData] = useState<string>('');
-  const deleteCategoryHandler = () => {
+  const categories = useAppSelector(getCategories);
+
+  const deleteCategoryHandler = (id: string) => {
+    dispatch(deletingCategoryThunk(id));
     console.log('USUWANIE PRODUKTU');
+    toast({
+      title: 'Category deleted',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
   };
 
   const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
@@ -58,6 +50,7 @@ const CategoriesPageContainer = () => {
   };
 
   const addCategoryHandler = () => {
+    dispatch(addingCategoryThunk(addCategoryData));
     toast({
       title: 'Category added',
       description: 'Category added',
@@ -73,7 +66,7 @@ const CategoriesPageContainer = () => {
     <div>
       <h3>
         Do you confirm deleting
-        {name}
+        <SpanComponent text={name} />
         ?
       </h3>
     </div>
@@ -102,7 +95,7 @@ const CategoriesPageContainer = () => {
     </div>
   );
 
-  const mappedData = MOCKED_DATA.map((data) => (
+  const mappedData = categories.map((data) => (
     <Tr key={data.id}>
       <Td>{data.id}</Td>
       <Td>{data.name}</Td>
@@ -118,7 +111,7 @@ const CategoriesPageContainer = () => {
         <ModalComponent
           modalHeader="Usuń kategorie"
           buttonText="Usuń"
-          modalAction={deleteCategoryHandler}
+          modalAction={() => deleteCategoryHandler(data.id)}
           modalContent={deletingProductModalContent(data.name)}
         />
       </Td>
@@ -130,9 +123,8 @@ const CategoriesPageContainer = () => {
     <SinglePageWrapperComponent>
       <TableComponent tableCaption="Categories" mappedData={mappedData} mappedHeaders={mappedHeaders} />
       <div style={{ flex: '0' }}>
-        <ModalComponent buttonText="Add invoice" modalAction={addCategoryHandler} modalHeader="Adding invoice" modalContent={addingCategoryModalContent} />
+        <ModalComponent buttonText="Add invoice" modalAction={addCategoryHandler} modalHeader="Adding category" modalContent={addingCategoryModalContent} />
       </div>
-      <Button onClick={() => dispatch(fetchingCategoriesThunk())}>TEST</Button>
     </SinglePageWrapperComponent>
   );
 };

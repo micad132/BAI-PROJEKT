@@ -75,8 +75,8 @@ const RegisterPageContainer = () => {
       <FormControlWrapper>
         <FormLabel>Safe Register</FormLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username')} />
-        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} />
-        <InputComponent placeholder="Confirm your password" value={confirmPassword} onChange={onChangeHandler('confirmPassword')} />
+        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} isPassword />
+        <InputComponent placeholder="Confirm your password" value={confirmPassword} onChange={onChangeHandler('confirmPassword')} isPassword />
         <InputComponent placeholder="Type your postal code here..." value={postalCode} onChange={onChangeHandler('postalCode')} />
         <InputComponent placeholder="Type your city here..." value={city} onChange={onChangeHandler('city')} />
         <InputComponent placeholder="Type your phone number here..." value={phoneNumber} onChange={onChangeHandler('phoneNumber')} />
@@ -94,8 +94,8 @@ const RegisterPageContainer = () => {
       <FormControlWrapper>
         <CustomLabel>Unsafe Register</CustomLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username')} />
-        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} />
-        <InputComponent placeholder="Confirm your password" value={confirmPassword} onChange={onChangeHandler('confirmPassword')} />
+        <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} isPassword />
+        <InputComponent placeholder="Confirm your password" value={confirmPassword} onChange={onChangeHandler('confirmPassword')} isPassword />
         <InputComponent placeholder="Type your postal code here..." value={postalCode} onChange={onChangeHandler('postalCode')} />
         <InputComponent placeholder="Type your city here..." value={city} onChange={onChangeHandler('city')} />
         <InputComponent placeholder="Type your phone number here..." value={phoneNumber} onChange={onChangeHandler('phoneNumber')} />

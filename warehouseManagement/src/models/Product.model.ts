@@ -1,13 +1,13 @@
 export type Product = {
   id: string,
+  id_category: string,
   name: string,
-  weight: number,
-  price: number,
+  describe: string,
 };
 
 export const INITIAL_PRODUCT_VALUES: Product = {
   id: '',
+  id_category: '',
   name: '',
-  weight: 0,
-  price: 0,
+  describe: '',
 };

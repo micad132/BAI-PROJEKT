@@ -28,16 +28,16 @@ export const ProductTableHeader = [
     isNumeric: false,
   },
   {
-    name: 'Nazwa',
+    name: 'ID kategorii',
     isNumeric: false,
   },
   {
-    name: 'Waga',
-    isNumeric: true,
+    name: 'Name',
+    isNumeric: false,
   },
   {
-    name: 'Cena',
-    isNumeric: true,
+    name: 'Description',
+    isNumeric: false,
   },
   {
     name: 'Edytuj',
@@ -66,22 +66,22 @@ export const mockedInvoices: Invoice[] = [
 
 ];
 
-export const InvoiceTableHeader = [
+export const WORKERS_TABLE_HEADERS = [
   {
     name: 'ID',
     isNumeric: false,
   },
   {
-    name: 'Data kupna',
+    name: 'Imie',
     isNumeric: false,
   },
   {
-    name: 'Koszt',
-    isNumeric: true,
+    name: 'Nazwisko',
+    isNumeric: false,
   },
   {
-    name: 'ID produkt',
-    isNumeric: true,
+    name: 'Workplace',
+    isNumeric: false,
   },
   {
     name: 'Edytuj',

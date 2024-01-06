@@ -1,13 +1,15 @@
 export type User = {
-  username: string,
-  postalCode: string,
-  city: string,
-  phoneNumber: string
+  email: string,
+  name: string,
+  role: string,
+  surname: string,
+  workplace: string,
 };
 
 export const INITIAL_USER_VALUE: User = {
-  username: '',
-  postalCode: '',
-  city: '',
-  phoneNumber: '',
+  email: '',
+  name: '',
+  role: '',
+  surname: '',
+  workplace: '',
 };

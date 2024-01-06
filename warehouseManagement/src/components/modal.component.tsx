@@ -12,7 +12,7 @@ import { ReactNode } from 'react';
 type Props = {
   modalHeader: string,
   buttonText: string,
-  modalAction: () => void,
+  modalAction: (id?: string) => void,
   modalContent: ReactNode,
 };
 

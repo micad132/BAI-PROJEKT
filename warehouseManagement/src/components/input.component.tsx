@@ -7,6 +7,7 @@ type Props = {
   value: string | number,
   onChange: (e: ChangeEvent<HTMLInputElement>) => void,
   isBlackText?: boolean,
+  isPassword?: boolean,
 };
 
 const TextInput = styled(Input)`
@@ -18,9 +19,9 @@ const TextInput = styled(Input)`
 `;
 
 const InputComponent = ({
-  placeholder, value, onChange, isBlackText,
+  placeholder, value, onChange, isBlackText, isPassword,
 }: Props) => (
-  <TextInput placeholder={placeholder} value={value} onChange={onChange} size="lg" isBlackText={isBlackText} />
+  <TextInput placeholder={placeholder} value={value} onChange={onChange} size="lg" isBlackText={isBlackText} type={isPassword ? 'password' : 'text'} />
 );
 
 export default InputComponent;

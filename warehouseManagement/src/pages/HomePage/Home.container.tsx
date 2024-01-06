@@ -1,19 +1,29 @@
-import { useEffect } from 'react';
-import { useAppDispatch, useAppSelector } from '../../store';
+import styled from 'styled-components';
+import { useAppSelector } from '../../store';
 import { getLoggedUser } from '../../store/reducers/userReducer.tsx';
 import LoggedUserComponent from './components/LoggedUser.component.tsx';
 import ContentTableComponent from './components/ContentTable.component.tsx';
-import { fetchingCategoriesThunk } from '../../store/reducers/categoryReducer.tsx';
+
+const NotLoggedUserComponentWrapper = styled.div`
+  background-color: red;
+  color: #fff;
+  padding: 10px 20px;
+  font-weight: bold;
+`;
 
 const HomeContainer = () => {
-  // const dispatch = useAppDispatch();
   const loggedUser = useAppSelector(getLoggedUser);
-  // useEffect(() => {
-  //   dispatch(fetchingCategoriesThunk());
-  // }, [dispatch]);
+  if (loggedUser.email === '') {
+    return (
+      <NotLoggedUserComponentWrapper>
+        Nie jesteś zalogowany!
+      </NotLoggedUserComponentWrapper>
+    );
+  }
+
   return (
     <div>
-      <LoggedUserComponent username={loggedUser.username} />
+      <LoggedUserComponent loggedUser={loggedUser} />
       <ContentTableComponent />
     </div>
   );

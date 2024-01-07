@@ -61,14 +61,13 @@ async def updateCategory(data: category_model.CategoryModel().Update, block: __B
     return response
 
 
-@router.delete("/", status_code=204)
-async def deleteCategory(data: category_model.CategoryModel().Delete, block: __BLOCK):
-    body = jsonable_encoder(data)
+@router.delete("/{id_category}", status_code=204)
+async def deleteCategory(id_category, block: __BLOCK):
     db.connect()
-    check = db.select("Category", {"id": body["id"]})
+    check = db.select("Category", {"id": id_category})
     if check:
         raise HTTPException(status_code=400, detail="Category not existed")
-    response = db.delete("Category", body)
+    response = db.delete("Category", {"id": id_category})
     db.close()
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")

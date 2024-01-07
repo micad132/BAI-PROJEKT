@@ -62,14 +62,13 @@ async def updateWorker(data: worker_model.WorkerModel().Update, block: __BLOCK):
     return response
 
 
-@router.delete("/", status_code=204)
-async def deleteWorker(data: worker_model.WorkerModel().Delete, block: __BLOCK):
-    body = jsonable_encoder(data)
+@router.delete("/{id_worker}", status_code=204)
+async def deleteWorker(id_worker,  block: __BLOCK):
     db.connect()
-    check = db.select("Workers", {"id": body["id"]})
+    check = db.select("Workers", {"id": id_worker})
     if not check:
         raise HTTPException(status_code=400, detail="Workers not existed")
-    response = db.delete("Workers", body)
+    response = db.delete("Workers", {"id": id_worker})
     db.close()
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")

@@ -61,14 +61,13 @@ async def updateProduct(data: product_model.ProductModel().Update, block: __BLOC
     return response
 
 
-@router.delete("/", status_code=204)
-async def deleteProduct(data: product_model.ProductModel().Delete, block: __BLOCK):
-    body = jsonable_encoder(data)
+@router.delete("/{id_product}", status_code=204)
+async def deleteProduct(id_product, block: __BLOCK):
     db.connect()
-    check = db.select("Product", {"id": body["id"]})
+    check = db.select("Product", {"id": id_product})
     if not check:
         raise HTTPException(status_code=400, detail="Product not existed")
-    response = db.delete("Product", body)
+    response = db.delete("Product", {"id": id_product})
     db.close()
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")

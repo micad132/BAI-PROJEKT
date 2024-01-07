@@ -41,13 +41,27 @@ export const addingCategoryThunk = createAsyncThunk(
 
 export const deletingCategoryThunk = createAsyncThunk(
   'deletingThunk',
-  async (id: string) => {
+  async (id_category: string) => {
     try {
-      await api.delete('http://localhost:8000/category/', { data: { id } });
+      const res = await api.delete(`http://localhost:8000/category/${id_category}`);
+      console.log('res', res);
       const data = await api.get('http://localhost:8000/category/');
       return data.data;
     } catch (e) {
       console.log(e);
+    }
+  },
+);
+
+export const updatingCategoryThunk = createAsyncThunk(
+  'updatingThunk',
+  async (editData: Category) => {
+    try {
+      await api.patch('http://localhost:8000/category/', editData);
+      const data = await api.get('http://localhost:8000/category/');
+      return data.data;
+    } catch (e) {
+      console.error(e);
     }
   },
 );
@@ -69,6 +83,10 @@ const categorySlice = createSlice({
       state.isLoaded = true;
     });
     builder.addCase(deletingCategoryThunk.fulfilled, (state, action) => {
+      state.categories = action.payload;
+      state.isLoaded = true;
+    });
+    builder.addCase(updatingCategoryThunk.fulfilled, (state, action) => {
       state.categories = action.payload;
       state.isLoaded = true;
     });

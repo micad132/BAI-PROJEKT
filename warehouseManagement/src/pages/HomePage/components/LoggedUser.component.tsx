@@ -18,13 +18,13 @@ const CustomSpan = styled.span`
 
 const LoggedUserComponent = ({ loggedUser }: Props) => (
   <LoggedUserComponentWrapper>
-    <h3>Witaj!</h3>
+    <h3>Hello!</h3>
     <h4>
-      Jesteś zalogowany jako
+      You are logged as
       <CustomSpan>{ loggedUser.email}</CustomSpan>
     </h4>
     <h4>
-      Twoja rola to
+      Your role is:
       <CustomSpan>{loggedUser.role}</CustomSpan>
     </h4>
     <h4>

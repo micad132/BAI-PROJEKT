@@ -11,3 +11,15 @@ export const INITIAL_PRODUCT_VALUES: Product = {
   name: '',
   describe: '',
 };
+
+export const INITIAL_ADD_PRODUCT_VALUES: AddProduct = {
+  id_category: '',
+  name: '',
+  describe: '',
+};
+
+export type AddProduct = {
+  id_category: string,
+  name: string,
+  describe: string,
+};

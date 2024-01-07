@@ -16,13 +16,13 @@ const HomeContainer = () => {
   if (loggedUser.email === '') {
     return (
       <NotLoggedUserComponentWrapper>
-        Nie jesteś zalogowany!
+        You are not logged!
       </NotLoggedUserComponentWrapper>
     );
   }
 
   return (
-    <div>
+    <div style={{ width: 600 }}>
       <LoggedUserComponent loggedUser={loggedUser} />
       <ContentTableComponent />
     </div>

@@ -9,7 +9,12 @@ import ModalComponent from '../../components/modal.component.tsx';
 import { CATEGORIES_TABLE_HEADERS } from '../../mock/mockData.mock.ts';
 import InputComponent from '../../components/input.component.tsx';
 import { sanitizeData } from '../../services/validators/validator.ts';
-import { addingCategoryThunk, deletingCategoryThunk, getCategories } from '../../store/reducers/categoryReducer.tsx';
+import {
+  addingCategoryThunk,
+  deletingCategoryThunk,
+  getCategories,
+  updatingCategoryThunk,
+} from '../../store/reducers/categoryReducer.tsx';
 import { useAppDispatch, useAppSelector } from '../../store';
 import SpanComponent from '../../components/span.component.tsx';
 
@@ -22,11 +27,11 @@ const CategoriesPageContainer = () => {
 
   const deleteCategoryHandler = (id: string) => {
     dispatch(deletingCategoryThunk(id));
-    console.log('USUWANIE PRODUKTU');
     toast({
       title: 'Category deleted',
       status: 'success',
       duration: 3000,
+      position: 'top-right',
       isClosable: true,
     });
   };
@@ -39,7 +44,12 @@ const CategoriesPageContainer = () => {
     setEditCategoryData(sanitizeData(e.target.value));
   };
 
-  const editCategoryHandler = () => {
+  const editCategoryHandler = (id: string) => {
+    const editData = {
+      id,
+      name: editCategoryData,
+    };
+    dispatch(updatingCategoryThunk(editData));
     console.log('EDYCJA PRODUKTU');
     toast({
       title: 'Product edited',
@@ -103,7 +113,7 @@ const CategoriesPageContainer = () => {
         <ModalComponent
           buttonText="Edytuj"
           modalHeader="Edytuj kategorie"
-          modalAction={editCategoryHandler}
+          modalAction={() => editCategoryHandler(data.id)}
           modalContent={editingProductModalContent(Number(data.id), data.name)}
         />
       </Td>
@@ -123,7 +133,7 @@ const CategoriesPageContainer = () => {
     <SinglePageWrapperComponent>
       <TableComponent tableCaption="Categories" mappedData={mappedData} mappedHeaders={mappedHeaders} />
       <div style={{ flex: '0' }}>
-        <ModalComponent buttonText="Add invoice" modalAction={addCategoryHandler} modalHeader="Adding category" modalContent={addingCategoryModalContent} />
+        <ModalComponent buttonText="Add category" modalAction={addCategoryHandler} modalHeader="Adding category" modalContent={addingCategoryModalContent} />
       </div>
     </SinglePageWrapperComponent>
   );

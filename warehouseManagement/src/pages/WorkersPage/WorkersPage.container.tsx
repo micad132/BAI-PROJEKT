@@ -9,16 +9,21 @@ import { InvoiceTableHeader, mockedInvoices, WORKERS_TABLE_HEADERS } from '../..
 import { Invoice, INVOICE_INITIAL_DATA } from '../../models/Invoice.model.ts';
 import InputComponent from '../../components/input.component.tsx';
 import { Product } from '../../models/Product.model.ts';
-import { useAppSelector } from '../../store';
-import { getWorkers } from '../../store/reducers/workersReducer.tsx';
+import { useAppDispatch, useAppSelector } from '../../store';
+import {
+  addingWorkerThunk,
+  deletingWorkersThunk,
+  editingWorkerThunk,
+  getWorkers,
+} from '../../store/reducers/workersReducer.tsx';
 import { getProducts } from '../../store/reducers/productReducer.tsx';
-import { AddWorker, INITIAL_WORKER_DATA } from '../../models/Worker.model.ts';
+import { AddWorker, INITIAL_WORKER_DATA, Worker } from '../../models/Worker.model.ts';
 
-const WORKPLACES = ['PRACOWNIK, KIEROWNIK'] as const;
+const WORKPLACES = ['PRACOWNIK', 'KIEROWNIK'] as const;
 
 const WorkersPageContainer = () => {
   const toast = useToast();
-
+  const dispatch = useAppDispatch();
   const [addWorkerData, setAddWorkerData] = useState<AddWorker>(INITIAL_WORKER_DATA);
   const [editWorkerData, setEditWorkerData] = useState<AddWorker>(INITIAL_WORKER_DATA);
   const workers = useAppSelector(getWorkers);
@@ -32,6 +37,20 @@ const WorkersPageContainer = () => {
     }));
   };
 
+  const onSelectChangeHandler = (type: string) => (e: ChangeEvent<HTMLSelectElement>) => {
+    setAddWorkerData((prevState) => ({
+      ...prevState,
+      [type]: e.target.value,
+    }));
+  };
+
+  const onSelectEditChangeHandler = (type: string) => (e: ChangeEvent<HTMLSelectElement>) => {
+    setEditWorkerData((prevState) => ({
+      ...prevState,
+      [type]: e.target.value,
+    }));
+  };
+
   const onEditChangeHandler = (type: string) => (e: ChangeEvent<HTMLInputElement>) => {
     setEditWorkerData((prevState) => ({
       ...prevState,
@@ -40,6 +59,7 @@ const WorkersPageContainer = () => {
   };
 
   const addWorkerHandler = () => {
+    dispatch(addingWorkerThunk(addWorkerData));
     toast({
       title: 'Worker added',
       description: 'Worker added',
@@ -51,19 +71,36 @@ const WorkersPageContainer = () => {
     setAddWorkerData(INITIAL_WORKER_DATA);
   };
 
-  const editWorkerHandler = () => {
+  const editWorkerHandler = (id: string) => {
+    const editData: Worker = {
+      id,
+      name: editWorkerData.name,
+      workplace: editWorkerData.workplace,
+      surname: editWorkerData.surname,
+    };
+    dispatch(editingWorkerThunk(editData));
     toast({
       title: 'Worker edited',
       description: 'Worker edited',
       status: 'success',
+      position: 'top-right',
       duration: 9000,
       isClosable: true,
     });
     setEditWorkerData(INITIAL_WORKER_DATA);
   };
 
-  const deleteWorkerHandler = () => {
+  const deleteWorkerHandler = (id: string) => {
     console.log('USUWANIE PRODUKTU');
+    dispatch(deletingWorkersThunk(id));
+    toast({
+      title: 'Worker deleted',
+      description: 'Worker deleted',
+      status: 'success',
+      position: 'top-right',
+      duration: 9000,
+      isClosable: true,
+    });
   };
 
   const addingWorkerModalContent = (
@@ -71,7 +108,7 @@ const WorkersPageContainer = () => {
       <h4>Add worker here</h4>
       <InputComponent placeholder="Worker name" value={addWorkerData.name} onChange={onChangeHandler('name')} />
       <InputComponent placeholder="Worker surname" value={addWorkerData.surname} onChange={onChangeHandler('surname')} />
-      <Select placeholder="Select workplace">
+      <Select placeholder="Select workplace" onChange={onSelectChangeHandler('workplace')}>
         {selectValues}
       </Select>
     </div>
@@ -82,7 +119,7 @@ const WorkersPageContainer = () => {
       <h4>Edit worker here</h4>
       <InputComponent placeholder="Worker name" value={editWorkerData.name} onChange={onEditChangeHandler('name')} />
       <InputComponent placeholder="Worker surname" value={editWorkerData.surname} onChange={onEditChangeHandler('surname')} />
-      <Select placeholder="Select workplace">
+      <Select placeholder="Select workplace" onChange={onSelectEditChangeHandler('workplace')}>
         {selectValues}
       </Select>
     </div>
@@ -105,7 +142,7 @@ const WorkersPageContainer = () => {
         <ModalComponent
           buttonText="Edit"
           modalHeader="Edit worker"
-          modalAction={editWorkerHandler}
+          modalAction={() => editWorkerHandler(data.id)}
           modalContent={editingWorkerModalContent}
         />
       </Td>
@@ -113,7 +150,7 @@ const WorkersPageContainer = () => {
         <ModalComponent
           modalHeader="Delete worker"
           buttonText="Delete"
-          modalAction={deleteWorkerHandler}
+          modalAction={() => deleteWorkerHandler(data.id)}
           modalContent={deletingWorkerModalContent}
         />
       </Td>

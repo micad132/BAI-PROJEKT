@@ -23,15 +23,18 @@ async def getLogin(login: str, block: __BLOCK):
 
 @router.post("/create", status_code=201)
 async def createAccount(user: login_model.LoginModel().Create):
-    # if block[0]["role"] != "ADMIN":
-    #     raise HTTPException(status_code=403, detail="Permission Denied")
+    #if block[0]["role"] != "ADMIN":
+    #    raise HTTPException(status_code=403, detail="Permission Denied")
     body = jsonable_encoder(user)
     data = auth.createHash(user.password)
     db.connect()
     check = db.select("Login", {"login": body["login"]})
     if check:
         raise HTTPException(status_code=400, detail="Account existed")
-    response = db.create("Login", {"login": user.login, "password": data[1], "salt": data[0], "role": "PRACOWNIK"})
+    workersBody = {"name": body["name"], "surname": body["surname"], "workplace": body["workplace"]}
+    db.create("Workers", workersBody)
+    workerID = db.select("Workers", workersBody)
+    response = db.create("Login", {"login": user.login, "password": data[1], "salt": data[0], "role": "PRACOWNIK", "id_pracownik": workerID[0]["id"]})
     db.close()
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")
@@ -39,23 +42,26 @@ async def createAccount(user: login_model.LoginModel().Create):
 
 
 @router.post("/create-unsafe", status_code=201)
-async def createUnSafeAccount(user: login_model.LoginModel().Create, block: __BLOCK):
-    if block[0]["role"] != "ADMIN":
-        raise HTTPException(status_code=403, detail="Permission Denied")
+async def createUnSafeAccount(user: login_model.LoginModel().Create):
+    #if block[0]["role"] != "ADMIN":
+    #    raise HTTPException(status_code=403, detail="Permission Denied")
     body = jsonable_encoder(user)
     data = auth.createMd5(user.password)
     db.connect()
     check = db.select("Login", {"login": body["login"]})
     if check:
         raise HTTPException(status_code=400, detail="Account existed")
-    response = db.create("Login", {"login": user.login, "password": data, "salt": 0, "role": "PRACOWNIK"})
+    workersBody = {"name": body["name"], "surname": body["surname"], "workplace": body["workplace"]}
+    db.create("Workers", workersBody)
+    workerID = db.select("Workers", workersBody)
+    response = db.create("Login", {"login": user.login, "password": data, "salt": 0, "role": "PRACOWNIK", "id_pracownik": workerID[0]["id"]})
     db.close()
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")
     return response
 
 @router.patch("/", status_code=200)
-async def updatePassword(data: login_model.LoginModel().Update, block: __BLOCK):
+async def updateAccount(data: login_model.LoginModel().Update, block: __BLOCK):
     if block[0]["role"] != "ADMIN":
         raise HTTPException(status_code=403, detail="Permission Denied")
     body = jsonable_encoder(data)

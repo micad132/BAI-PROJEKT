@@ -1,3 +1,4 @@
+import sqlalchemy
 from sqlalchemy import create_engine
 from sqlalchemy import text
 from sqlalchemy.orm import sessionmaker
@@ -22,11 +23,14 @@ class Database:
             self.__engine.dispose()
 
     def query(self, query):
-        session = self.__createSessions()
-        result = session.execute(text(query))
-        records = result.fetchall()
-        column_names = result.keys()
-        return [dict(zip(column_names, record)) for record in records]
+        try:
+            session = self.__createSessions()
+            result = session.execute(text(query))
+            records = result.fetchall()
+            column_names = result.keys()
+            return [dict(zip(column_names, record)) for record in records]
+        except Exception:
+            return None
 
     def select(self, table, parameters=None):
         if not table:

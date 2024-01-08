@@ -9,6 +9,9 @@ class LoginModel:
     class Create(BaseModel):
         login: str
         password: str
+        name: str
+        surname: str
+        workplace:str
 
     class Update(BaseModel):
         login: str

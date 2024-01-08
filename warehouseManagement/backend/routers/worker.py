@@ -33,6 +33,8 @@ async def getWorker(id_worker, block: __BLOCK):
 
 @router.post("/", status_code=201)
 async def createWorker(data: worker_model.WorkerModel().Create, block: __BLOCK):
+    if block[0]["role"] != "ADMIN":
+        raise HTTPException(status_code=403, detail="Permission Denied")
     body = jsonable_encoder(data)
     db.connect()
     check = db.select("Workers", {"name": body["name"], "surname": body["surname"]})
@@ -47,6 +49,8 @@ async def createWorker(data: worker_model.WorkerModel().Create, block: __BLOCK):
 
 @router.patch("/", status_code=200)
 async def updateWorker(data: worker_model.WorkerModel().Update, block: __BLOCK):
+    if block[0]["role"] != "ADMIN":
+        raise HTTPException(status_code=403, detail="Permission Denied")
     body = jsonable_encoder(data)
     for key, value in dict(body).items():
         if value is None:
@@ -64,6 +68,8 @@ async def updateWorker(data: worker_model.WorkerModel().Update, block: __BLOCK):
 
 @router.delete("/{id_worker}", status_code=204)
 async def deleteWorker(id_worker,  block: __BLOCK):
+    if block[0]["role"] != "ADMIN":
+        raise HTTPException(status_code=403, detail="Permission Denied")
     db.connect()
     check = db.select("Workers", {"id": id_worker})
     if not check:

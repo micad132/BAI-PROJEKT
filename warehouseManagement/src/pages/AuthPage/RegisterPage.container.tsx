@@ -6,17 +6,23 @@ import {
 import { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { INITIAL_REGISTER_VALUES, RegisterData } from '../../models/Auth.model.ts';
 import InputComponent from '../../components/input.component.tsx';
 import AuthPageWrapperComponent from '../../components/authPageWrapper.component.tsx';
 
-const FormWrapper = styled.form`
+const MainContentWrapper = styled.div`
   background-color: #5B7B7A;
   width: 80% !important;
   margin: 0 auto;
   border-radius: 10px;
   padding: 10px;
-  color: #fff;
+`;
+
+const FormWrapper = styled.form`
+  width: 80% !important;
+  margin: 0 auto;
+  padding: 10px;
 `;
 
 const FormControlWrapper = styled(FormControl)`
@@ -32,14 +38,14 @@ const FormControlWrapper = styled(FormControl)`
 
 const CustomLabel = styled(FormLabel)`
   padding: 0px;
-  text-align: center;
+  text-align: center; 
 `;
 
 const RegisterPageContainer = () => {
   const [isSafeRegister, setIsSafeRegister] = useState<boolean>(false);
   const [loginData, setLoginData] = useState<RegisterData>(INITIAL_REGISTER_VALUES);
   const {
-    username, password, confirmPassword, city, postalCode, phoneNumber,
+    username, password, confirmPassword,
   } = loginData;
   const [isLoginSending, setIsLoginSending] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -52,22 +58,28 @@ const RegisterPageContainer = () => {
     }));
   };
 
-  const onSubmitHandler = (e: any) => {
-    setIsLoginSending(true);
+  const onSubmitHandler = async (e: any) => {
     e.preventDefault();
-    return new Promise(() => setTimeout(() => {
-      setIsLoginSending(false);
-      setLoginData(INITIAL_REGISTER_VALUES);
+    try {
+      console.log('WBILEM');
+      setIsLoginSending(true);
+      const data = await axios.post('http://localhost:8000/Account/create', { login: 'jach', password: 'ilovelewica' }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
+      console.log('DATA', data);
       toast({
-        title: 'Pomyślnie zarejestrowano!',
+        title: 'Successfully registered!',
         status: 'success',
-        description: 'Teraz możesz się zalogować',
+        description: 'Now you can log in',
         duration: 3000,
         isClosable: true,
         position: 'top-right',
       });
       navigate('/login');
-    }, 2000));
+    } catch (re) {
+      console.log(re);
+    }
+
+    setIsLoginSending(false);
+    setLoginData(INITIAL_REGISTER_VALUES);
   };
 
   const mainContent = isSafeRegister ? (
@@ -77,9 +89,6 @@ const RegisterPageContainer = () => {
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username')} />
         <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} isPassword />
         <InputComponent placeholder="Confirm your password" value={confirmPassword} onChange={onChangeHandler('confirmPassword')} isPassword />
-        <InputComponent placeholder="Type your postal code here..." value={postalCode} onChange={onChangeHandler('postalCode')} />
-        <InputComponent placeholder="Type your city here..." value={city} onChange={onChangeHandler('city')} />
-        <InputComponent placeholder="Type your phone number here..." value={phoneNumber} onChange={onChangeHandler('phoneNumber')} />
         <Button
           isLoading={isLoginSending}
           type="submit"
@@ -96,9 +105,6 @@ const RegisterPageContainer = () => {
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username')} />
         <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password')} isPassword />
         <InputComponent placeholder="Confirm your password" value={confirmPassword} onChange={onChangeHandler('confirmPassword')} isPassword />
-        <InputComponent placeholder="Type your postal code here..." value={postalCode} onChange={onChangeHandler('postalCode')} />
-        <InputComponent placeholder="Type your city here..." value={city} onChange={onChangeHandler('city')} />
-        <InputComponent placeholder="Type your phone number here..." value={phoneNumber} onChange={onChangeHandler('phoneNumber')} />
         <Button
           isLoading={isLoginSending}
           type="submit"
@@ -118,9 +124,9 @@ const RegisterPageContainer = () => {
       >
         Safe register?
       </Checkbox>
-      <FormWrapper>
+      <MainContentWrapper>
         {mainContent}
-      </FormWrapper>
+      </MainContentWrapper>
     </AuthPageWrapperComponent>
   );
 };

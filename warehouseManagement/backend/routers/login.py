@@ -22,9 +22,9 @@ async def getLogin(login: str, block: __BLOCK):
 
 
 @router.post("/create", status_code=201)
-async def createAccount(user: login_model.LoginModel().Create, block: __BLOCK):
-    if block[0]["role"] != "ADMIN":
-        raise HTTPException(status_code=403, detail="Permission Denied")
+async def createAccount(user: login_model.LoginModel().Create):
+    # if block[0]["role"] != "ADMIN":
+    #     raise HTTPException(status_code=403, detail="Permission Denied")
     body = jsonable_encoder(user)
     data = auth.createHash(user.password)
     db.connect()

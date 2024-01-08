@@ -15,6 +15,7 @@ import { setLoggedUser } from '../../store/reducers/userReducer.tsx';
 import AuthPageWrapperComponent from '../../components/authPageWrapper.component.tsx';
 import { sanitizeData, validateLogin } from '../../services/validators/validator.ts';
 import { User } from '../../models/User.model.ts';
+import api from '../../services/api/AxiosApi.ts';
 
 const MainContentWrapper = styled.div`
   background-color: #5B7B7A;
@@ -65,35 +66,74 @@ const LoginPageContainer = () => {
     }));
   };
 
-  const onSubmitHandler = async (e: any) => {
+  const onSubmitHandler = async (e: any, safe: boolean) => {
     setIsLoginSending(true);
     e.preventDefault();
-    const { data } = await axios.post('http://localhost:8000/SignIn', { username, password }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
-    console.log('DATA', data);
-    const loggedUserData: User = {
-      email: data.email,
-      name: data.name,
-      role: data.role,
-      surname: data.role,
-      workplace: data.workplace,
-    };
-    localStorage.setItem('accessToken', data.access_token);
-    localStorage.setItem('refreshToken', data.refresh_token);
-    setIsLoginSending(false);
-    setLoginData(INITIAL_LOGIN_VALUES);
-    toast({
-      title: 'Pomyślnie zalogowano!',
-      status: 'success',
-      duration: 3000,
-      isClosable: true,
-      position: 'top-right',
-    });
-    dispatch(setLoggedUser(loggedUserData));
-    navigate('/');
+    try {
+      if (safe) {
+        console.log('SAFE');
+        const { data } = await api.post('http://localhost:8000/SignIn', { username, password }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
+        console.log('DATA', data);
+        const loggedUserData: User = {
+          email: data.email,
+          name: data.name,
+          role: data.role,
+          surname: data.role,
+          workplace: data.workplace,
+        };
+        localStorage.setItem('accessToken', data.access_token);
+        localStorage.setItem('refreshToken', data.refresh_token);
+        setIsLoginSending(false);
+        setLoginData(INITIAL_LOGIN_VALUES);
+        toast({
+          title: 'Successfully logged!',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+          position: 'top-right',
+        });
+        dispatch(setLoggedUser(loggedUserData));
+        navigate('/');
+      } else {
+        console.log('UNSAFE');
+        const { data } = await api.post('http://localhost:8000/SignIn-unsafe', { username, password }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
+        console.log('DATA', data);
+        const loggedUserData: User = {
+          email: data.email,
+          name: data.name,
+          role: data.role,
+          surname: data.role,
+          workplace: data.workplace,
+        };
+        localStorage.setItem('accessToken', data.access_token);
+        localStorage.setItem('refreshToken', data.refresh_token);
+        setIsLoginSending(false);
+        setLoginData(INITIAL_LOGIN_VALUES);
+        toast({
+          title: 'Successfully logged!',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+          position: 'top-right',
+        });
+        dispatch(setLoggedUser(loggedUserData));
+        navigate('/');
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Login failed!',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      setIsLoginSending(false);
+      setLoginData(INITIAL_LOGIN_VALUES);
+    }
   };
 
   const mainContent = isSafeLoginChecked ? (
-    <FormWrapper onSubmit={onSubmitHandler}>
+    <FormWrapper onSubmit={(e: any) => onSubmitHandler(e, true)}>
       <FormControlWrapper>
         <CustomLabel>Safe Login</CustomLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', true)} />
@@ -109,7 +149,7 @@ const LoginPageContainer = () => {
       </FormControlWrapper>
     </FormWrapper>
   ) : (
-    <FormWrapper onSubmit={onSubmitHandler}>
+    <FormWrapper onSubmit={(e: any) => onSubmitHandler(e, false)}>
       <FormControlWrapper>
         <CustomLabel>Unsafe Login</CustomLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', false)} />

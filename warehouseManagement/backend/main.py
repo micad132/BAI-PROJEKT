@@ -9,10 +9,7 @@ from routers import category, product,login, worker
 
 app = FastAPI()
 origins = [
-    "http://localhost.com",
-    "https://localhost.com",
-    "http://localhost",
-    "http://localhost:8080",
+    "*"
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -36,6 +33,7 @@ app.include_router(worker.router)
 @app.post("/SignIn", response_model= token_model.TokenModel, status_code=200)
 async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = auth.authenticateUser(form_data.username, form_data.password)
+    print(user)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

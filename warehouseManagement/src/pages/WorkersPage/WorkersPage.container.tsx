@@ -18,6 +18,7 @@ import {
 } from '../../store/reducers/workersReducer.tsx';
 import { getProducts } from '../../store/reducers/productReducer.tsx';
 import { AddWorker, INITIAL_WORKER_DATA, Worker } from '../../models/Worker.model.ts';
+import api from '../../services/api/AxiosApi.ts';
 
 const WORKPLACES = ['PRACOWNIK', 'KIEROWNIK'] as const;
 
@@ -26,6 +27,7 @@ const WorkersPageContainer = () => {
   const dispatch = useAppDispatch();
   const [addWorkerData, setAddWorkerData] = useState<AddWorker>(INITIAL_WORKER_DATA);
   const [editWorkerData, setEditWorkerData] = useState<AddWorker>(INITIAL_WORKER_DATA);
+  const [sqlInjection, setSqlInjection] = useState<string>('');
   const workers = useAppSelector(getWorkers);
 
   const selectValues = WORKPLACES.map((workplace) => <option key={workplace} value={workplace}>{workplace}</option>);
@@ -42,6 +44,10 @@ const WorkersPageContainer = () => {
       ...prevState,
       [type]: e.target.value,
     }));
+  };
+
+  const onSQLHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setSqlInjection(e.target.value);
   };
 
   const onSelectEditChangeHandler = (type: string) => (e: ChangeEvent<HTMLSelectElement>) => {
@@ -69,6 +75,18 @@ const WorkersPageContainer = () => {
       position: 'top-right',
     });
     setAddWorkerData(INITIAL_WORKER_DATA);
+  };
+
+  const sqlInjectionHandler = async () => {
+    const id_worker: string = sqlInjection;
+    const res = await api.get(`http://localhost:8000/worker/${id_worker}`);
+    console.log('RESPONSE', res);
+    toast({
+      title: 'Baza w pizdu!',
+      status: 'success',
+      position: 'top-right',
+    });
+    setSqlInjection('');
   };
 
   const editWorkerHandler = (id: string) => {
@@ -102,6 +120,13 @@ const WorkersPageContainer = () => {
       isClosable: true,
     });
   };
+
+  const sqlInjectionModalContent = (
+    <div>
+      <h4>Wywal sobie bazke tu</h4>
+      <InputComponent placeholder="Sql inj" value={sqlInjection} onChange={onSQLHandler} />
+    </div>
+  );
 
   const addingWorkerModalContent = (
     <div>
@@ -161,6 +186,7 @@ const WorkersPageContainer = () => {
       <TableComponent tableCaption="Workers" mappedData={mappedData} mappedHeaders={mappedHeaders} />
       <div style={{ flex: '0' }}>
         <ModalComponent buttonText="Add worker" modalAction={addWorkerHandler} modalHeader="Adding worker" modalContent={addingWorkerModalContent} />
+        <ModalComponent buttonText="TEST SQL" modalAction={sqlInjectionHandler} modalHeader="SQL Injection" modalContent={sqlInjectionModalContent} />
       </div>
     </SinglePageWrapperComponent>
   );

@@ -18,11 +18,17 @@ __CONFIG = config.load_yml("config.yml")
 
 
 def __verifyPassword(id_user, password: str):
+    print(1)
     __DATABASE.connect()
     response = __DATABASE.select("Login", {"id": id_user})
     __DATABASE.close()
     to_verify = (f"$argon2{__CONFIG['AUTH']['TYPE']}$v=19$m={__CONFIG['AUTH']['MEM']},t={__CONFIG['AUTH']['TIME_COST']},"
                  f"p={__CONFIG['AUTH']['PARAL']}${response[0]['salt']}${response[0]['password']}")
+    print(to_verify)
+    print((argon2.using(
+        type=__CONFIG['AUTH']['TYPE'], salt_len = __CONFIG['AUTH']['SALT_LEN'], time_cost = __CONFIG['AUTH']['TIME_COST'],
+                   memory_cost = __CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
+            .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify)))
     return (argon2.using(
         type=__CONFIG['AUTH']['TYPE'], salt_len = __CONFIG['AUTH']['SALT_LEN'], time_cost = __CONFIG['AUTH']['TIME_COST'],
                    memory_cost = __CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
@@ -107,6 +113,7 @@ def refreshAccessToken(refresh_token: str):
 
 def authenticateUser(username: str, password: str, safe=True):
     user = __getUser(username)
+    print(user)
     if not user:
         return False
     if not safe:

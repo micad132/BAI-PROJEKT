@@ -9,7 +9,7 @@ from passlib.hash import argon2, md5_crypt
 import hashlib
 import config
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="SignIn")
 
 
 __DATABASE = database.Database(url="sqlite:///./database/warehouseManagment.db")

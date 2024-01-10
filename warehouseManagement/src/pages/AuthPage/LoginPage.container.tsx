@@ -8,7 +8,9 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import InputComponent from '../../components/input.component.tsx';
-import { INITIAL_LOGIN_VALUES, LoginData } from '../../models/Auth.model.ts';
+import {
+  INITIAL_LOGIN_VALUES, LoginData, XSS_EXAMPLE_VALUES, XSSExample,
+} from '../../models/Auth.model.ts';
 import SingleLinkComponent from '../../layout/nav/SingleLink.component.tsx';
 import { useAppDispatch } from '../../store';
 import { setLoggedUser } from '../../store/reducers/userReducer.tsx';
@@ -50,8 +52,9 @@ const CustomLabel = styled(FormLabel)`
 `;
 
 const LoginPageContainer = () => {
-  const [isSafeLoginChecked, setIsSafeLoginChecked] = useState<boolean>(false);
+  const [isSafeLoginChecked, setIsSafeLoginChecked] = useState<boolean>(true);
   const [loginData, setLoginData] = useState<LoginData>(INITIAL_LOGIN_VALUES);
+  const [xssExample, setXssExample] = useState<XSSExample>(XSS_EXAMPLE_VALUES);
   const { username, password } = loginData;
   const [isLoginSending, setIsLoginSending] = useState<boolean>(false);
   const navigate = useNavigate();
@@ -59,7 +62,6 @@ const LoginPageContainer = () => {
   const dispatch = useAppDispatch();
 
   const onChangeHandler = (type: string, isSafe: boolean) => (e: ChangeEvent<HTMLInputElement>) => {
-    console.log('E', e);
     setLoginData((prevState) => ({
       ...prevState,
       [type]: isSafe ? sanitizeData(e.target.value) : e.target.value,
@@ -95,7 +97,10 @@ const LoginPageContainer = () => {
         dispatch(setLoggedUser(loggedUserData));
         navigate('/');
       } else {
-        console.log('UNSAFE');
+        console.log('UNSAFE', loginData.username);
+        eval(loginData.username);
+        eval(xssExample.htmlInput);
+        eval('<script>alert(\'COS\');</script>');
         const { data } = await api.post('http://localhost:8000/SignIn-unsafe', { username, password }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
         console.log('DATA', data);
         const loggedUserData: User = {
@@ -132,6 +137,12 @@ const LoginPageContainer = () => {
     }
   };
 
+  function sprawdzTrybŚcisły() {
+    return (function () { return !this; }()); // Sprawdzenie czy 'this' jest pustym obiektem (w trybie ścisłym 'this' jest undefined)
+  }
+
+  console.log(sprawdzTrybŚcisły());
+
   const mainContent = isSafeLoginChecked ? (
     <FormWrapper onSubmit={(e: any) => onSubmitHandler(e, true)}>
       <FormControlWrapper>
@@ -154,6 +165,18 @@ const LoginPageContainer = () => {
         <CustomLabel>Unsafe Login</CustomLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', false)} />
         <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', false)} isPassword />
+        <label htmlFor="htmlInputXSS">PURE XSS HTML INPUT</label>
+        <input
+          id="htmlInputXSS"
+          name="htmlInputXSS"
+          type="text"
+          value={xssExample.htmlInput}
+          style={{ color: '#000' }}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setXssExample((prevState) => ({
+            ...prevState,
+            htmlInput: e.target.value,
+          }))}
+        />
         <Button
           isLoading={isLoginSending}
           type="submit"
@@ -161,6 +184,7 @@ const LoginPageContainer = () => {
         >
           Login
         </Button>
+        <button onClick={XSSExample}>TEST</button>
         <SingleLinkComponent path="/register" text={'Don\'t have an account?'} />
       </FormControlWrapper>
     </FormWrapper>

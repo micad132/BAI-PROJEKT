@@ -36,11 +36,16 @@ def __verifyPassword(id_user, password: str):
             .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify))
 
 
+def createMd5(password: str):
+    return hashlib.md5(password.encode()).hexdigest()
+
+
 def __verifyUnsafePassword(id_user, password: str):
     __DATABASE.connect()
     response = __DATABASE.select("Login", {"id": id_user})
     __DATABASE.close()
-    return md5_crypt.verify(password, response[0]["password"])
+    return createMd5(password) == response[0]["password"]
+
 
 def createHash(password: str):
     hash = (argon2.using(type=__CONFIG['AUTH']['TYPE'], salt_len=__CONFIG['AUTH']['SALT_LEN'],
@@ -48,11 +53,6 @@ def createHash(password: str):
                          memory_cost=__CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
             .hash(hashlib.sha512(password.encode('UTF-8')).hexdigest())).split('$')
     return hash[4], hash[5] #sol, haslo
-
-
-
-def createMd5(password: str):
-    return md5_crypt.hash(password)
 
 
 def verifyPassword(password: str):

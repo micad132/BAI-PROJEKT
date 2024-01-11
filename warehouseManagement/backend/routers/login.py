@@ -34,7 +34,11 @@ async def createAccount(user: login_model.LoginModel().Create):
     workersBody = {"name": body["name"], "surname": body["surname"], "workplace": body["workplace"]}
     db.create("Workers", workersBody)
     workerID = db.select("Workers", workersBody)
-    response = db.create("Login", {"login": user.login, "password": data[1], "salt": data[0], "role": "PRACOWNIK", "id_pracownik": workerID[0]["id"]})
+    response = db.create("Login", {"login": user.login, "password": data[1], "role": "PRACOWNIK", "id_pracownik": workerID[0]["id"]})
+    check_create = db.select("Login", {"login": user.login})
+    if not check_create:
+        raise HTTPException(status_code=400, detail="Sol")
+    db.create("Salt", {"id_login": check_create[0]["id"], "salt": data[0]})
     db.close()
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")
@@ -74,8 +78,9 @@ async def updateAccount(data: login_model.LoginModel().Update, block: __BLOCK):
     if not auth.verifyPassword(body["password"]):
         raise HTTPException(status_code=400, detail="Passoword not allowed")
     new = auth.createHash(body["password"])
-    body["password"], body["salt"] = new[1], new[0]
+    body["password"] = new[1]
     response = db.update("Login", {"id": check[0]["id"]}, body)
+    db.update("Salt", {"id_login": check[0]["id"]}, {"salt": new[0]})
     db.close()
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")
@@ -92,6 +97,7 @@ async def deleteAccount(data: login_model.LoginModel().Delete, block: __BLOCK):
     if not check:
         raise HTTPException(status_code=400, detail="Account not existed")
     response = db.delete("Login", body)
+    db.delete("Salt", {"id_login": check[0]["id"]})
     db.close()
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")

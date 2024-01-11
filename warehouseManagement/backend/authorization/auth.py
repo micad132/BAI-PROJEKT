@@ -21,10 +21,11 @@ __CONFIG = config.load_yml("config.yml")
 def __verifyPassword(id_user, password: str):
     print(1)
     __DATABASE.connect()
-    response = __DATABASE.select("Login", {"id": id_user})
+    response_pass = __DATABASE.select("Login", {"id": id_user})
+    response_salt = __DATABASE.select("Salt", {"id_login": id_user})
     __DATABASE.close()
     to_verify = (f"$argon2{__CONFIG['AUTH']['TYPE']}$v=19$m={__CONFIG['AUTH']['MEM']},t={__CONFIG['AUTH']['TIME_COST']},"
-                 f"p={__CONFIG['AUTH']['PARAL']}${response[0]['salt']}${response[0]['password']}")
+                 f"p={__CONFIG['AUTH']['PARAL']}${response_salt[0]['salt']}${response_pass[0]['password']}")
     print(to_verify)
     print((argon2.using(
         type=__CONFIG['AUTH']['TYPE'], salt_len = __CONFIG['AUTH']['SALT_LEN'], time_cost = __CONFIG['AUTH']['TIME_COST'],

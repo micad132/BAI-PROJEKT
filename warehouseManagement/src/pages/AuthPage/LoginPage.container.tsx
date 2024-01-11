@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import InputComponent from '../../components/input.component.tsx';
 import {
-  INITIAL_LOGIN_VALUES, LoginData, XSS_EXAMPLE_VALUES, XSSExample,
+  INITIAL_LOGIN_VALUES, LoginData,
 } from '../../models/Auth.model.ts';
 import SingleLinkComponent from '../../layout/nav/SingleLink.component.tsx';
 import { useAppDispatch } from '../../store';
@@ -18,6 +18,16 @@ import AuthPageWrapperComponent from '../../components/authPageWrapper.component
 import { sanitizeData, validateLogin } from '../../services/validators/validator.ts';
 import { User } from '../../models/User.model.ts';
 import api from '../../services/api/AxiosApi.ts';
+
+type XSSExample = {
+  htmlInput: string,
+  evalExample: string,
+};
+
+const XSS_EXAMPLE_VALUES: XSSExample = {
+  htmlInput: '',
+  evalExample: '',
+};
 
 const MainContentWrapper = styled.div`
   background-color: #5B7B7A;
@@ -38,17 +48,11 @@ const FormControlWrapper = styled(FormControl)`
     display: flex;
     flex-direction: column;
     gap: 10px;
-  justify-content: center;
+    align-items: center;
     & > *:not(label) {
       width: 80% !important;
       margin: 0 auto;
     }
-`;
-
-const CustomLabel = styled(FormLabel)`
-  display: block;
-  background-color: palevioletred;
-  text-align: center;
 `;
 
 const LoginPageContainer = () => {
@@ -146,7 +150,7 @@ const LoginPageContainer = () => {
   const mainContent = isSafeLoginChecked ? (
     <FormWrapper onSubmit={(e: any) => onSubmitHandler(e, true)}>
       <FormControlWrapper>
-        <CustomLabel>Safe Login</CustomLabel>
+        <FormLabel>Safe Login</FormLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', true)} />
         <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', true)} isPassword />
         <Button
@@ -162,21 +166,9 @@ const LoginPageContainer = () => {
   ) : (
     <FormWrapper onSubmit={(e: any) => onSubmitHandler(e, false)}>
       <FormControlWrapper>
-        <CustomLabel>Unsafe Login</CustomLabel>
+        <FormLabel>Unsafe Login</FormLabel>
         <InputComponent placeholder="Type your username here..." value={username} onChange={onChangeHandler('username', false)} />
         <InputComponent placeholder="Type your password here..." value={password} onChange={onChangeHandler('password', false)} isPassword />
-        <label htmlFor="htmlInputXSS">PURE XSS HTML INPUT</label>
-        <input
-          id="htmlInputXSS"
-          name="htmlInputXSS"
-          type="text"
-          value={xssExample.htmlInput}
-          style={{ color: '#000' }}
-          onChange={(e: ChangeEvent<HTMLInputElement>) => setXssExample((prevState) => ({
-            ...prevState,
-            htmlInput: e.target.value,
-          }))}
-        />
         <Button
           isLoading={isLoginSending}
           type="submit"
@@ -184,7 +176,6 @@ const LoginPageContainer = () => {
         >
           Login
         </Button>
-        <button onClick={XSSExample}>TEST</button>
         <SingleLinkComponent path="/register" text={'Don\'t have an account?'} />
       </FormControlWrapper>
     </FormWrapper>

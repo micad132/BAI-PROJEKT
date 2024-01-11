@@ -111,16 +111,16 @@ const CategoriesPageContainer = () => {
       <Td>{data.name}</Td>
       <Td>
         <ModalComponent
-          buttonText="Edytuj"
-          modalHeader="Edytuj kategorie"
+          buttonText="Edit"
+          modalHeader="Edit category"
           modalAction={() => editCategoryHandler(data.id)}
           modalContent={editingProductModalContent(Number(data.id), data.name)}
         />
       </Td>
       <Td>
         <ModalComponent
-          modalHeader="Usuń kategorie"
-          buttonText="Usuń"
+          modalHeader="Delete category"
+          buttonText="Delete"
           modalAction={() => deleteCategoryHandler(data.id)}
           modalContent={deletingProductModalContent(data.name)}
         />

@@ -21,6 +21,8 @@ import { getProducts } from '../../store/reducers/productReducer.tsx';
 import { AddWorker, INITIAL_WORKER_DATA, Worker } from '../../models/Worker.model.ts';
 import api from '../../services/api/AxiosApi.ts';
 import { User } from '../../models/User.model.ts';
+import { sanitizeData } from '../../services/validators/validator.ts';
+import SpanComponent from '../../components/span.component.tsx';
 
 const WORKPLACES = ['PRACOWNIK', 'KIEROWNIK'] as const;
 
@@ -43,7 +45,7 @@ const WorkersPageContainer = () => {
   const onChangeHandler = (type: string) => (e: ChangeEvent<HTMLInputElement>) => {
     setAddWorkerData((prevState) => ({
       ...prevState,
-      [type]: e.target.value,
+      [type]: sanitizeData(e.target.value),
     }));
   };
 
@@ -68,7 +70,7 @@ const WorkersPageContainer = () => {
   const onEditChangeHandler = (type: string) => (e: ChangeEvent<HTMLInputElement>) => {
     setEditWorkerData((prevState) => ({
       ...prevState,
-      [type]: e.target.value,
+      [type]: sanitizeData(e.target.value),
     }));
   };
 
@@ -171,9 +173,12 @@ const WorkersPageContainer = () => {
     </div>
   );
 
-  const deletingWorkerModalContent = (
+  const deletingWorkerModalContent = (name: string) => (
     <div>
-      <h3>Do you confirm deleting?</h3>
+      <h3>
+        Do you confirm deleting?
+        <SpanComponent text={name} />
+      </h3>
     </div>
   );
 
@@ -219,7 +224,7 @@ const WorkersPageContainer = () => {
           modalHeader="Delete worker"
           buttonText="Delete"
           modalAction={() => deleteWorkerHandler(data.id)}
-          modalContent={deletingWorkerModalContent}
+          modalContent={deletingWorkerModalContent(data.name)}
         />
       </Td>
     </Tr>

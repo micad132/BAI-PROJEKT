@@ -40,11 +40,11 @@ export const ProductTableHeader = [
     isNumeric: false,
   },
   {
-    name: 'Edytuj',
+    name: 'Edit',
     isNumeric: false,
   },
   {
-    name: 'Usuń',
+    name: 'Delete',
     isNumeric: false,
   },
 ];
@@ -84,11 +84,11 @@ export const WORKERS_TABLE_HEADERS = [
     isNumeric: false,
   },
   {
-    name: 'Edytuj',
+    name: 'Edit',
     isNumeric: false,
   },
   {
-    name: 'Usuń',
+    name: 'Delete',
     isNumeric: false,
   },
 ];
@@ -103,11 +103,11 @@ export const CATEGORIES_TABLE_HEADERS = [
     isNumeric: false,
   },
   {
-    name: 'Edytuj',
+    name: 'Edit',
     isNumeric: false,
   },
   {
-    name: 'Usuń',
+    name: 'Delete',
     isNumeric: false,
   },
 ] as const;

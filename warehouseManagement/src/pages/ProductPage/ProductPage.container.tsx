@@ -20,6 +20,7 @@ import {
   getProducts,
 } from '../../store/reducers/productReducer.tsx';
 import { getCategories } from '../../store/reducers/categoryReducer.tsx';
+import SpanComponent from '../../components/span.component.tsx';
 
 const ProductPageContainer = () => {
   const dispatch = useAppDispatch();
@@ -135,7 +136,7 @@ const ProductPageContainer = () => {
     <div>
       <h3>
         Do you confirm deleting
-        {name}
+        <SpanComponent text={name} />
         ?
       </h3>
     </div>
@@ -151,16 +152,16 @@ const ProductPageContainer = () => {
       <Td>{data.describe}</Td>
       <Td>
         <ModalComponent
-          buttonText="Edytuj"
-          modalHeader="Edytuj produkt"
+          buttonText="Edit"
+          modalHeader="Edit product"
           modalAction={() => editProductHandler(data.id)}
           modalContent={editingProductModalContent(Number(data.id), data.name)}
         />
       </Td>
       <Td>
         <ModalComponent
-          modalHeader="Usuń produkt"
-          buttonText="Usuń"
+          modalHeader="Delete product"
+          buttonText="Delete"
           modalAction={() => deleteProductHandler(data.id)}
           modalContent={deletingProductModalContent(data.name)}
         />
@@ -170,7 +171,7 @@ const ProductPageContainer = () => {
 
   return (
     <SinglePageWrapperComponent>
-      <TableComponent tableCaption="Produkty" mappedData={mappedData} mappedHeaders={mappedHeaders} />
+      <TableComponent tableCaption="Products" mappedData={mappedData} mappedHeaders={mappedHeaders} />
       <div style={{ flex: '0' }}>
         <ModalComponent buttonText="Add product" modalAction={addProductHandler} modalHeader="Adding product" modalContent={addingProductModalContent} />
       </div>

@@ -20,4 +20,3 @@ class LoginModel:
 
     class Delete(BaseModel):
         login: str
-        password: str

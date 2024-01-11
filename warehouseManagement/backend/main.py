@@ -40,7 +40,7 @@ async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, De
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=1)
+    access_token_expires = timedelta(minutes=10)
     refresh_token_expires = timedelta(days=30)
     access_token = auth.createAccessToken(data={"sub": user["login"]}, expires_delta=access_token_expires)
     refresh_token = auth.createRefreshToken(data={"sub": user["login"]}, expires_delta=refresh_token_expires)
@@ -64,7 +64,7 @@ async def loginForUnsafeAccessToken(form_data: Annotated[OAuth2PasswordRequestFo
             detail="Incorrect email or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    access_token_expires = timedelta(minutes=1)
+    access_token_expires = timedelta(minutes=10)
     refresh_token_expires = timedelta(days=30)
     access_token = auth.createAccessToken(data={"sub": user["login"]}, expires_delta=access_token_expires)
     refresh_token = auth.createRefreshToken(data={"sub": user["login"]}, expires_delta=refresh_token_expires)

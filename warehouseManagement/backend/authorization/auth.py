@@ -8,6 +8,7 @@ from database import database
 from passlib.hash import argon2, md5_crypt
 import hashlib
 import config
+import re
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="SignIn")
 
@@ -27,11 +28,11 @@ def __verifyPassword(id_user, password: str):
     print(to_verify)
     print((argon2.using(
         type=__CONFIG['AUTH']['TYPE'], salt_len = __CONFIG['AUTH']['SALT_LEN'], time_cost = __CONFIG['AUTH']['TIME_COST'],
-                   memory_cost = __CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
-            .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify)))
+        memory_cost = __CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
+           .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify)))
     return (argon2.using(
         type=__CONFIG['AUTH']['TYPE'], salt_len = __CONFIG['AUTH']['SALT_LEN'], time_cost = __CONFIG['AUTH']['TIME_COST'],
-                   memory_cost = __CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
+        memory_cost = __CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
             .verify(hashlib.sha512(password.encode('UTF-8')).hexdigest(), to_verify))
 
 
@@ -46,11 +47,19 @@ def createHash(password: str):
                          time_cost=__CONFIG['AUTH']['TIME_COST'],
                          memory_cost=__CONFIG['AUTH']['MEM'], parallelism=__CONFIG['AUTH']['PARAL'])
             .hash(hashlib.sha512(password.encode('UTF-8')).hexdigest())).split('$')
-    return hash[4], hash[5]
+    return hash[4], hash[5] #sol, haslo
+
 
 
 def createMd5(password: str):
     return md5_crypt.hash(password)
+
+
+def verifyPassword(password: str):
+    if re.fullmatch(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{12,}$', password):
+        return True
+    else:
+        return False
 
 
 def __getUser(username: str):

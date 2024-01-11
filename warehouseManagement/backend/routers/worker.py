@@ -33,7 +33,7 @@ async def getWorker(id_worker, block: __BLOCK):
 
 @router.post("/", status_code=201)
 async def createWorker(data: worker_model.WorkerModel().Create, block: __BLOCK):
-    if block[0]["role"] != "ADMIN":
+    if block["role"] != "ADMIN":
         raise HTTPException(status_code=403, detail="Permission Denied")
     body = jsonable_encoder(data)
     db.connect()
@@ -49,7 +49,7 @@ async def createWorker(data: worker_model.WorkerModel().Create, block: __BLOCK):
 
 @router.patch("/", status_code=200)
 async def updateWorker(data: worker_model.WorkerModel().Update, block: __BLOCK):
-    if block[0]["role"] != "ADMIN":
+    if block["role"] != "ADMIN":
         raise HTTPException(status_code=403, detail="Permission Denied")
     body = jsonable_encoder(data)
     for key, value in dict(body).items():
@@ -68,7 +68,7 @@ async def updateWorker(data: worker_model.WorkerModel().Update, block: __BLOCK):
 
 @router.delete("/{id_worker}", status_code=204)
 async def deleteWorker(id_worker,  block: __BLOCK):
-    if block[0]["role"] != "ADMIN":
+    if block["role"] != "ADMIN":
         raise HTTPException(status_code=403, detail="Permission Denied")
     db.connect()
     check = db.select("Workers", {"id": id_worker})
@@ -79,4 +79,3 @@ async def deleteWorker(id_worker,  block: __BLOCK):
     if response is None:
         raise HTTPException(status_code=418, detail="I’m a teapot")
     return response
-

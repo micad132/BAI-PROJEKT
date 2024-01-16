@@ -88,7 +88,7 @@ const RegisterPageContainer = () => {
       } else {
         console.log('WBILEM');
         setIsLoginSending(true);
-        const data = await api.post('http://localhost:8000/Account/create-unsafe', loginData, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
+        const data = await api.post('http://localhost:8000/Account/create-unsafe', newData, { headers: { 'content-type': 'application/x-www-form-urlencoded' } });
         console.log('DATA', data);
         toast({
           title: 'Successfully registered!',

@@ -14,16 +14,39 @@ type Props = {
   buttonText: string,
   modalAction: (id?: string) => void,
   modalContent: ReactNode,
+  onCloseFromParent?: () => void,
+  onOpenFromParent?: () => void,
+  isClosingDisabled?: boolean,
+  test?: string,
 };
 
 const ModalComponent = ({
-  modalHeader, buttonText, modalAction, modalContent,
+  modalHeader, buttonText, modalAction, modalContent, onCloseFromParent, onOpenFromParent, isClosingDisabled, test,
 }: Props) => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const { isOpen, onOpen: onOpenOriginal, onClose: onCloseOriginal } = useDisclosure();
 
   const onClick = () => {
-    modalAction();
-    onClose();
+    console.log('test', test?.length);
+    console.log('ON KLIK', isClosingDisabled);
+    if (!isClosingDisabled) {
+      modalAction();
+      onCloseOriginal();
+    }
+  };
+
+  const onOpen = () => {
+    if (onOpenFromParent) {
+      onOpenFromParent();
+    }
+    onOpenOriginal();
+  };
+
+  const onClose = () => {
+    console.log('PRZED ZAMEK');
+    if (onCloseFromParent) {
+      onCloseFromParent();
+    }
+    onCloseOriginal();
   };
 
   return (

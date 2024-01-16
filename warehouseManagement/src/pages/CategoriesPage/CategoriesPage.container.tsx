@@ -8,7 +8,7 @@ import TableComponent from '../../components/table.component.tsx';
 import ModalComponent from '../../components/modal.component.tsx';
 import { CATEGORIES_TABLE_HEADERS } from '../../mock/mockData.mock.ts';
 import InputComponent from '../../components/input.component.tsx';
-import { sanitizeData } from '../../services/validators/validator.ts';
+import { sanitizeData, validateSingleString } from '../../services/validators/validator.ts';
 import {
   addingCategoryThunk,
   deletingCategoryThunk,
@@ -23,6 +23,7 @@ const CategoriesPageContainer = () => {
   const toast = useToast();
   const [addCategoryData, setAddCategoryData] = useState<string>('');
   const [editCategoryData, setEditCategoryData] = useState<string>('');
+  const [categoryError, setCategoryError] = useState<string>('');
   const categories = useAppSelector(getCategories);
 
   const deleteCategoryHandler = (id: string) => {
@@ -45,6 +46,18 @@ const CategoriesPageContainer = () => {
   };
 
   const editCategoryHandler = (id: string) => {
+    console.log('EDIT CAT', editCategoryData);
+    if (validateSingleString(editCategoryData)) {
+      setCategoryError('Invalid category name');
+      toast({
+        title: 'Invalid input',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
     const editData = {
       id,
       name: editCategoryData,
@@ -60,6 +73,17 @@ const CategoriesPageContainer = () => {
   };
 
   const addCategoryHandler = () => {
+    if (validateSingleString(addCategoryData)) {
+      setCategoryError('Invalid category name');
+      toast({
+        title: 'Invalid input',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
     dispatch(addingCategoryThunk(addCategoryData));
     toast({
       title: 'Category added',
@@ -70,6 +94,7 @@ const CategoriesPageContainer = () => {
       position: 'top-right',
     });
     setAddCategoryData('');
+    setCategoryError('');
   };
 
   const deletingProductModalContent = (name: string) => (
@@ -90,7 +115,7 @@ const CategoriesPageContainer = () => {
         {' '}
         here
       </h4>
-      <InputComponent placeholder="Category name" value={editCategoryData} onChange={onEditChangeHandler} />
+      <InputComponent placeholder="Category name" value={editCategoryData} onChange={onEditChangeHandler} errorText={categoryError} />
     </div>
   );
 
@@ -101,6 +126,7 @@ const CategoriesPageContainer = () => {
         placeholder="Category name"
         value={addCategoryData}
         onChange={onChangeHandler}
+        errorText={categoryError}
       />
     </div>
   );
@@ -115,6 +141,12 @@ const CategoriesPageContainer = () => {
           modalHeader="Edit category"
           modalAction={() => editCategoryHandler(data.id)}
           modalContent={editingProductModalContent(Number(data.id), data.name)}
+          onCloseFromParent={() => {
+            setCategoryError('');
+            setEditCategoryData('');
+          }}
+          isClosingDisabled={categoryError.length > 0}
+          test={categoryError}
         />
       </Td>
       <Td>

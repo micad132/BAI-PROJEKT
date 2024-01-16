@@ -140,7 +140,18 @@ const WorkersPageContainer = () => {
       surname: 'string645645',
       workplace: 'string53453543',
     };
-    await axios.post('http://localhost:8000/Account/create-unsafe', requestData, { headers: { 'Content-type': 'application/json' } });
+    try {
+      await axios.post('http://localhost:8000/Account/create-unsafe', requestData, { headers: { 'Content-type': 'application/json' } });
+    } catch (e) {
+      toast({
+        title: 'Worker injected',
+        description: 'Worker injected',
+        status: 'warning',
+        position: 'top-right',
+        duration: 9000,
+        isClosable: true,
+      });
+    }
   };
 
   const sqlInjectionModalContent = (

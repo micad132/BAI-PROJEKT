@@ -16,3 +16,5 @@ const LoginSchema = z.object({
 export const validateLogin = (loginValues: LoginData): SafeParseReturnType<LoginData, any> => LoginSchema.safeParse(loginValues);
 
 export const sanitizeData = (value: string): string => DOMPurify.sanitize(value, { USE_PROFILES: { html: false } });
+
+export const validateSingleString = (value: string): boolean => value.length <= 0 || value.includes('&lt') || value.includes('&gt');

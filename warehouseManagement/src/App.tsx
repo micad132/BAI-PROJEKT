@@ -11,7 +11,7 @@ import { fetchingProductsThunk } from './store/reducers/productReducer.tsx';
 import { fetchingWorkersThunk } from './store/reducers/workersReducer.tsx';
 
 const AppWrapper = styled.div`
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
     padding: 0;
     overflow: hidden;

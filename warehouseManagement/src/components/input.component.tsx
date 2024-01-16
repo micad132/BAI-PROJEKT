@@ -1,4 +1,4 @@
-import { Input } from '@chakra-ui/react';
+import { Badge, Input } from '@chakra-ui/react';
 import { ChangeEvent } from 'react';
 import styled from 'styled-components';
 
@@ -8,6 +8,7 @@ type Props = {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void,
   isBlackText?: boolean,
   isPassword?: boolean,
+  errorText?: string,
 };
 
 const TextInput = styled(Input)`
@@ -18,10 +19,29 @@ const TextInput = styled(Input)`
   }
 `;
 
+const CustomBadge = styled(Badge)`
+  margin-top: 10px;
+  margin-left: 5px;
+`;
+
 const InputComponent = ({
-  placeholder, value, onChange, isBlackText, isPassword,
-}: Props) => (
-  <TextInput placeholder={placeholder} value={value} onChange={onChange} size="lg" isBlackText={isBlackText} type={isPassword ? 'password' : 'text'} />
-);
+  placeholder, value, onChange, isBlackText, isPassword, errorText,
+}: Props) => {
+  console.log('COS');
+  return (
+    <>
+      <TextInput
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        size="lg"
+        isBlackText={isBlackText}
+        type={isPassword ? 'password' : 'text'}
+        isInvalid={errorText}
+      />
+      {errorText && <CustomBadge colorScheme="red">{errorText}</CustomBadge>}
+    </>
+  );
+};
 
 export default InputComponent;

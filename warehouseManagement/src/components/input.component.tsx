@@ -27,7 +27,7 @@ const CustomBadge = styled(Badge)`
 const InputComponent = ({
   placeholder, value, onChange, isBlackText, isPassword, errorText,
 }: Props) => {
-  console.log('COS');
+  console.log('COS', errorText);
   return (
     <>
       <TextInput

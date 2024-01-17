@@ -1,5 +1,5 @@
 import {
-  Td, Th, Tr, useToast, Select, Button,
+  Td, Th, Tr, useToast, Select, Button, Badge,
 } from '@chakra-ui/react';
 import { ChangeEvent, useState } from 'react';
 import axios from 'axios';
@@ -18,7 +18,13 @@ import {
   getWorkers,
 } from '../../store/reducers/workersReducer.tsx';
 import { getProducts } from '../../store/reducers/productReducer.tsx';
-import { AddWorker, INITIAL_WORKER_DATA, Worker } from '../../models/Worker.model.ts';
+import {
+  AddWorker,
+  INITIAL_WORKER_DATA,
+  INITIAL_WORKER_ERRORS,
+  Worker,
+  WorkerErrors,
+} from '../../models/Worker.model.ts';
 import api from '../../services/api/AxiosApi.ts';
 import { User } from '../../models/User.model.ts';
 import { sanitizeData } from '../../services/validators/validator.ts';
@@ -37,6 +43,8 @@ const WorkersPageContainer = () => {
   const dispatch = useAppDispatch();
   const [addWorkerData, setAddWorkerData] = useState<AddWorker>(INITIAL_WORKER_DATA);
   const [editWorkerData, setEditWorkerData] = useState<AddWorker>(INITIAL_WORKER_DATA);
+  const [workerErrors, setWorkerErrors] = useState<WorkerErrors>(INITIAL_WORKER_ERRORS);
+  const [editWorkerErrors, setEditWorkerErrors] = useState<WorkerErrors>(INITIAL_WORKER_ERRORS);
   const [sqlInjection, setSqlInjection] = useState<string>('');
   const workers = useAppSelector(getWorkers);
 
@@ -75,6 +83,33 @@ const WorkersPageContainer = () => {
   };
 
   const addWorkerHandler = () => {
+    const errorData: WorkerErrors = INITIAL_WORKER_ERRORS;
+    let isError = false;
+    if (addWorkerData.name === '' || addWorkerData.name.includes('&')) {
+      errorData.name = 'Invalid name!';
+      isError = true;
+    }
+    if (addWorkerData.surname === '' || addWorkerData.surname.includes('&')) {
+      errorData.surname = 'Invalid surname';
+      isError = true;
+    }
+    if (addWorkerData.workplace === '' || addWorkerData.workplace.includes('&')) {
+      errorData.workplace = 'Invalid workplace';
+      isError = true;
+    }
+    if (isError) {
+      console.log('LOG', errorData);
+      setWorkerErrors(errorData);
+      toast({
+        title: 'Invalid data',
+        description: 'Invalid data',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
     dispatch(addingWorkerThunk(addWorkerData));
     toast({
       title: 'Worker added',
@@ -85,6 +120,7 @@ const WorkersPageContainer = () => {
       position: 'top-right',
     });
     setAddWorkerData(INITIAL_WORKER_DATA);
+    setWorkerErrors(INITIAL_WORKER_ERRORS);
   };
 
   const sqlInjectionHandler = async () => {
@@ -100,6 +136,32 @@ const WorkersPageContainer = () => {
   };
 
   const editWorkerHandler = (id: string) => {
+    const errorData: WorkerErrors = INITIAL_WORKER_ERRORS;
+    let isError = false;
+    if (editWorkerData.name === '') {
+      errorData.name = 'Invalid name!';
+      isError = true;
+    }
+    if (editWorkerData.surname === '' || editWorkerData.surname.includes('&')) {
+      errorData.name = 'Invalid surname';
+      isError = true;
+    }
+    if (editWorkerData.workplace === '' || editWorkerData.workplace.includes('&')) {
+      errorData.workplace = 'Invalid workplace';
+      isError = true;
+    }
+    if (isError) {
+      setEditWorkerErrors(errorData);
+      toast({
+        title: 'Invalid data',
+        description: 'Invalid data',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      return;
+    }
     const editData: Worker = {
       id,
       name: editWorkerData.name,
@@ -116,6 +178,7 @@ const WorkersPageContainer = () => {
       isClosable: true,
     });
     setEditWorkerData(INITIAL_WORKER_DATA);
+    setEditWorkerErrors(INITIAL_WORKER_ERRORS);
   };
 
   const deleteWorkerHandler = (id: string) => {
@@ -164,22 +227,24 @@ const WorkersPageContainer = () => {
   const addingWorkerModalContent = (
     <div>
       <h4>Add worker here</h4>
-      <InputComponent placeholder="Worker name" value={addWorkerData.name} onChange={onChangeHandler('name')} />
-      <InputComponent placeholder="Worker surname" value={addWorkerData.surname} onChange={onChangeHandler('surname')} />
-      <Select placeholder="Select workplace" onChange={onSelectChangeHandler('workplace')}>
+      <InputComponent placeholder="Worker name" value={addWorkerData.name} onChange={onChangeHandler('name')} errorText={workerErrors.name} />
+      <InputComponent placeholder="Worker surname" value={addWorkerData.surname} onChange={onChangeHandler('surname')} errorText={workerErrors.surname} />
+      <Select placeholder="Select workplace" onChange={onSelectChangeHandler('workplace')} style={{ marginTop: 10 }}>
         {selectValues}
       </Select>
+      {workerErrors.workplace && <Badge colorScheme="red">{workerErrors.workplace}</Badge>}
     </div>
   );
 
   const editingWorkerModalContent = (
     <div>
       <h4>Edit worker here</h4>
-      <InputComponent placeholder="Worker name" value={editWorkerData.name} onChange={onEditChangeHandler('name')} />
-      <InputComponent placeholder="Worker surname" value={editWorkerData.surname} onChange={onEditChangeHandler('surname')} />
-      <Select placeholder="Select workplace" onChange={onSelectEditChangeHandler('workplace')}>
+      <InputComponent placeholder="Worker name" value={editWorkerData.name} onChange={onEditChangeHandler('name')} errorText={editWorkerErrors.name} />
+      <InputComponent placeholder="Worker surname" value={editWorkerData.surname} onChange={onEditChangeHandler('surname')} errorText={editWorkerErrors.surname} />
+      <Select placeholder="Select workplace" onChange={onSelectEditChangeHandler('workplace')} style={{ marginTop: 10 }}>
         {selectValues}
       </Select>
+      {editWorkerErrors.workplace && <Badge colorScheme="red">{editWorkerErrors.workplace}</Badge>}
       <img src="/niema/adresu" onError={imgXssAttack} />
     </div>
   );

@@ -23,3 +23,15 @@ export type AddProduct = {
   name: string,
   describe: string,
 };
+
+export type ProductError = {
+  id_category: string,
+  name: string,
+  describe: string,
+};
+
+export const PRODUCT_ERROR_INITIAL_VALUES: ProductError = {
+  id_category: '',
+  name: '',
+  describe: '',
+};

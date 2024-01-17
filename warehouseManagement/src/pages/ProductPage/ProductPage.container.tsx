@@ -1,6 +1,7 @@
 import {
   Button, Td, Th, Tr, useToast,
   Select,
+  Badge,
 } from '@chakra-ui/react';
 import { ChangeEvent, useState } from 'react';
 import TableComponent from '../../components/table.component.tsx';
@@ -8,7 +9,7 @@ import { mockedProducts, ProductTableHeader } from '../../mock/mockData.mock.ts'
 import ModalComponent from '../../components/modal.component.tsx';
 import InputComponent from '../../components/input.component.tsx';
 import {
-  AddProduct, INITIAL_ADD_PRODUCT_VALUES, INITIAL_PRODUCT_VALUES, Product,
+  AddProduct, INITIAL_ADD_PRODUCT_VALUES, INITIAL_PRODUCT_VALUES, Product, PRODUCT_ERROR_INITIAL_VALUES, ProductError,
 } from '../../models/Product.model.ts';
 import SinglePageWrapperComponent from '../../components/singlePageWrapper.component.tsx';
 import { sanitizeData } from '../../services/validators/validator.ts';
@@ -27,6 +28,8 @@ const ProductPageContainer = () => {
   const toast = useToast();
   const [newProductData, setNewProductData] = useState<AddProduct>(INITIAL_ADD_PRODUCT_VALUES);
   const [editProductData, setEditProductData] = useState<AddProduct>(INITIAL_ADD_PRODUCT_VALUES);
+  const [productErrors, setProductErrors] = useState<ProductError>(PRODUCT_ERROR_INITIAL_VALUES);
+  const [editProductErrors, setEditProductErrors] = useState<ProductError>(PRODUCT_ERROR_INITIAL_VALUES);
   const products = useAppSelector(getProducts);
   const categories = useAppSelector(getCategories);
 
@@ -59,34 +62,88 @@ const ProductPageContainer = () => {
   };
 
   const addProductHandler = () => {
-    dispatch(addingProductThunk(newProductData));
-    toast({
-      title: 'Product added',
-      description: 'Product added',
-      status: 'success',
-      duration: 9000,
-      isClosable: true,
-      position: 'top-right',
-    });
-    setNewProductData(INITIAL_ADD_PRODUCT_VALUES);
+    const errorData: ProductError = PRODUCT_ERROR_INITIAL_VALUES;
+    let isError = false;
+    if (newProductData.id_category === '') {
+      errorData.id_category = 'ID cannot be null!';
+      isError = true;
+    }
+    if (newProductData.name === '' || newProductData.name.includes('&')) {
+      errorData.name = 'Invalid name';
+      isError = true;
+    }
+    if (newProductData.describe === '' || newProductData.describe.includes('&')) {
+      errorData.describe = 'Invalid description';
+      isError = true;
+    }
+    if (isError) {
+      console.log('ERROR DATA', errorData);
+      setProductErrors(errorData);
+      toast({
+        title: 'Invalid data',
+        description: 'Invalid data',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+    } else {
+      dispatch(addingProductThunk(newProductData));
+      toast({
+        title: 'Product added',
+        description: 'Product added',
+        status: 'success',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+      setNewProductData(INITIAL_ADD_PRODUCT_VALUES);
+      setProductErrors(PRODUCT_ERROR_INITIAL_VALUES);
+    }
   };
 
   const editProductHandler = (id: string) => {
-    const editData: Product = {
-      id,
-      id_category: editProductData.id_category,
-      describe: editProductData.describe,
-      name: editProductData.name,
-    };
-    dispatch(editingProductThunk(editData));
-    toast({
-      title: 'Product edited',
-      status: 'success',
-      duration: 3000,
-      position: 'top-right',
-      isClosable: true,
-    });
-    setEditProductData(INITIAL_PRODUCT_VALUES);
+    const errorData: ProductError = PRODUCT_ERROR_INITIAL_VALUES;
+    let isErrorEdit = false;
+    if (editProductData.id_category === '') {
+      errorData.id_category = 'ID cannot be null!';
+      isErrorEdit = true;
+    }
+    if (editProductData.name === '' || editProductData.name.includes('&')) {
+      errorData.name = 'Invalid name';
+      isErrorEdit = true;
+    }
+    if (editProductData.describe === '' || editProductData.describe.includes('&')) {
+      errorData.describe = 'Invalid description';
+      isErrorEdit = true;
+    }
+    if (isErrorEdit) {
+      setEditProductErrors(errorData);
+      toast({
+        title: 'Invalid data',
+        description: 'Invalid data',
+        status: 'error',
+        duration: 9000,
+        isClosable: true,
+        position: 'top-right',
+      });
+    } else {
+      const editData: Product = {
+        id,
+        id_category: editProductData.id_category,
+        describe: editProductData.describe,
+        name: editProductData.name,
+      };
+      dispatch(editingProductThunk(editData));
+      toast({
+        title: 'Product edited',
+        status: 'success',
+        duration: 3000,
+        position: 'top-right',
+        isClosable: true,
+      });
+      setEditProductData(INITIAL_PRODUCT_VALUES);
+    }
   };
 
   const deleteProductHandler = (id: string) => {
@@ -108,11 +165,13 @@ const ProductPageContainer = () => {
         placeholder="Product name"
         value={newProductData.name}
         onChange={onChangeHandler('name')}
+        errorText={productErrors.name}
       />
-      <InputComponent placeholder="Product description" value={newProductData.describe} onChange={onChangeHandler('describe')} />
+      <InputComponent placeholder="Product description" value={newProductData.describe} onChange={onChangeHandler('describe')} errorText={productErrors.describe} />
       <Select placeholder="Select category" style={{ marginTop: 10 }} onChange={onSelectChangeHandler('id_category')}>
         {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
       </Select>
+      {productErrors.id_category && <Badge colorScheme="red">{productErrors.id_category}</Badge>}
     </div>
   );
 
@@ -124,11 +183,12 @@ const ProductPageContainer = () => {
         {' '}
         here
       </h4>
-      <InputComponent placeholder="Product name" value={editProductData.name} onChange={onEditChangeHandler('name')} />
-      <InputComponent placeholder="Product description" value={editProductData.describe} onChange={onEditChangeHandler('describe')} />
+      <InputComponent placeholder="Product name" value={editProductData.name} onChange={onEditChangeHandler('name')} errorText={editProductErrors.name} />
+      <InputComponent placeholder="Product description" value={editProductData.describe} onChange={onEditChangeHandler('describe')} errorText={editProductErrors.describe} />
       <Select placeholder="Select category" style={{ marginTop: 10 }} onChange={onSelectEditChangeHandler('id_category')}>
         {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
       </Select>
+      {editProductErrors.id_category && <Badge colorScheme="red">{editProductErrors.id_category}</Badge>}
     </div>
   );
 
@@ -173,7 +233,12 @@ const ProductPageContainer = () => {
     <SinglePageWrapperComponent>
       <TableComponent tableCaption="Products" mappedData={mappedData} mappedHeaders={mappedHeaders} />
       <div style={{ flex: '0' }}>
-        <ModalComponent buttonText="Add product" modalAction={addProductHandler} modalHeader="Adding product" modalContent={addingProductModalContent} />
+        <ModalComponent
+          buttonText="Add product"
+          modalAction={addProductHandler}
+          modalHeader="Adding product"
+          modalContent={addingProductModalContent}
+        />
       </div>
     </SinglePageWrapperComponent>
   );

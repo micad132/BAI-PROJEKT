@@ -36,6 +36,7 @@ const ModalComponent = ({
 
   const onOpen = () => {
     if (onOpenFromParent) {
+      console.log('WBILEM HERE');
       onOpenFromParent();
     }
     onOpenOriginal();

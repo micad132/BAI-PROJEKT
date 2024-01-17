@@ -6,6 +6,7 @@ import RegisterPageContainer from '../pages/AuthPage/RegisterPage.container.tsx'
 import ProductPageContainer from '../pages/ProductPage/ProductPage.container.tsx';
 import WorkersPageContainer from '../pages/WorkersPage/WorkersPage.container.tsx';
 import CategoriesPageContainer from '../pages/CategoriesPage/CategoriesPage.container.tsx';
+import LogoutPageContainer from '../pages/LogoutPage/LogoutPage.container.tsx';
 
 const routes = (
   <Routes>
@@ -16,6 +17,7 @@ const routes = (
     <Route path="/products" element={<ProductPageContainer />} />
     <Route path="/workers" element={<WorkersPageContainer />} />
     <Route path="/categories" element={<CategoriesPageContainer />} />
+    <Route path="/logout" element={<LogoutPageContainer />} />
   </Routes>
 );
 

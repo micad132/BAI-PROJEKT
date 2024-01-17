@@ -6,13 +6,11 @@ import {
 import { ChangeEvent, useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
 import { INITIAL_REGISTER_VALUES, RegisterData } from '../../models/Auth.model.ts';
 import InputComponent from '../../components/input.component.tsx';
 import AuthPageWrapperComponent from '../../components/authPageWrapper.component.tsx';
 import { sanitizeData } from '../../services/validators/validator.ts';
 import api from '../../services/api/AxiosApi.ts';
-import PasswordInfo from '../../components/passwordInfo.component.tsx';
 
 const MainContentWrapper = styled.div`
   background-color: #5B7B7A;
@@ -115,7 +113,7 @@ const RegisterPageContainer = () => {
               <li>At least one digit</li>
               <li>At least one special character</li>
             </ul>
-          </div>,
+                       </div>,
           duration: 3000,
           isClosable: true,
           position: 'top-right',
